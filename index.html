@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+<!-- M E T A   T A G S -->
+        <meta charset="UTF-8" />
+
+<!-- M E D I A   Q U E R I E S -->
+        
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Elm HN PWA</title>
+
+        <meta name="description" content="Hacker News Reader as a Progressive Web App built with Elm" />
+
+<!-- I C O N S -->
+
+        <link rel="shortcut icon" href="/svg/elm.svg" />
+        <link rel="apple-touch-icon" href="/svg/elm.svg" />
+
+<!-- M A N I F E S T -->
+        <link rel="manifest" href="/manifest.json">
+
+<!-- C S S -->
+        <link rel="preload" type="text/css" href="/css/hn.css" media="screen" as="style">
+        <link rel="stylesheet" type="text/css" href="/css/hn.css" media="screen">
+
+<!-- J S -->
+    </head>
+
+    <body>
+        <header role="banner">
+          <img class="icons" id="elmlogo" src="/svg/elm.svg" alt="built with Elm" />
+          <h1>Elm HN PWA</h1>
+          <a href="https://github.com/skrypte/elm-hn-pwa" rel="noopener" target="_blank" title="elm HN PWA source code">
+              <img class="icons" id="githubicon" src="/svg/github.svg" alt="source code" />
+          </a>
+
+          <nav>
+              <ul role="menu">
+                  <li class="nav__item" role="menuitem">
+                      <a href="#/top" class="nav__link">top</a>
+                  </li>
+                  <li class="nav__item" role="menuitem">
+                      <a href="#/new" class="nav__link">new</a>
+                  </li>
+                  <li class="nav__item" role="menuitem">
+                      <a href="#/show" class="nav__link">show</a>
+                  </li>
+                  <li class="nav__item" role="menuitem">
+                      <a href="#/ask" class="nav__link">ask</a>
+                  </li>
+                  <li class="nav__item" role="menuitem">
+                      <a href="#/jobs" class="nav__link">jobs</a>
+                  </li>
+              </ul>
+          </nav>
+        </header>
+
+        <div id="elmembed">
+        </div>
+        
+        <script src="elm.js"></script>
+        <script>
+            var menuitems = document.getElementsByClassName("nav__link");
+            for (i=0;i<5;i++){
+                menuitems[i].addEventListener("click", function(){
+                    var hasActive = document.querySelector(".active");
+                    if (hasActive != null){
+                        hasActive.classList.remove("active");
+                    }
+                    this.classList.add("active")
+                });
+            }
+            var div = document.getElementById("elmembed");
+            Elm.Hnpwa.embed(div);
+        </script>
+    </body>
+</html>

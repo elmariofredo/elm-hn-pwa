@@ -1,0 +1,393 @@
+var _jinjor$elm_html_parser$HtmlParser_Util$toSvgAttribute = function (_p0) {
+	var _p1 = _p0;
+	var _p3 = _p1._1;
+	var _p2 = _p1._0;
+	return A2(_elm_lang$core$String$startsWith, 'xlink:', _p2) ? A3(_elm_lang$virtual_dom$VirtualDom$attributeNS, 'http://www.w3.org/1999/xlink', _p2, _p3) : (A2(_elm_lang$core$String$startsWith, 'xml:', _p2) ? A3(_elm_lang$virtual_dom$VirtualDom$attributeNS, 'http://www.w3.org/XML/1998/namespace', _p2, _p3) : A2(_elm_lang$virtual_dom$VirtualDom$attribute, _p2, _p3));
+};
+var _jinjor$elm_html_parser$HtmlParser_Util$toVirtualDomSvg = function (nodes) {
+	return A2(_elm_lang$core$List$map, _jinjor$elm_html_parser$HtmlParser_Util$toVirtualDomSvgEach, nodes);
+};
+var _jinjor$elm_html_parser$HtmlParser_Util$toVirtualDomSvgEach = function (node) {
+	var _p4 = node;
+	switch (_p4.ctor) {
+		case 'Element':
+			return A3(
+				_elm_lang$svg$Svg$node,
+				_p4._0,
+				A2(_elm_lang$core$List$map, _jinjor$elm_html_parser$HtmlParser_Util$toSvgAttribute, _p4._1),
+				_jinjor$elm_html_parser$HtmlParser_Util$toVirtualDomSvg(_p4._2));
+		case 'Text':
+			return _elm_lang$html$Html$text(_p4._0);
+		default:
+			return _elm_lang$html$Html$text('');
+	}
+};
+var _jinjor$elm_html_parser$HtmlParser_Util$toAttribute = function (_p5) {
+	var _p6 = _p5;
+	return A2(_elm_lang$html$Html_Attributes$attribute, _p6._0, _p6._1);
+};
+var _jinjor$elm_html_parser$HtmlParser_Util$toVirtualDom = function (nodes) {
+	return A2(_elm_lang$core$List$map, _jinjor$elm_html_parser$HtmlParser_Util$toVirtualDomEach, nodes);
+};
+var _jinjor$elm_html_parser$HtmlParser_Util$toVirtualDomEach = function (node) {
+	var _p7 = node;
+	switch (_p7.ctor) {
+		case 'Element':
+			var _p8 = _p7._0;
+			return _elm_lang$core$Native_Utils.eq(_p8, 'svg') ? _jinjor$elm_html_parser$HtmlParser_Util$toVirtualDomSvgEach(node) : A3(
+				_elm_lang$html$Html$node,
+				_p8,
+				A2(_elm_lang$core$List$map, _jinjor$elm_html_parser$HtmlParser_Util$toAttribute, _p7._1),
+				_jinjor$elm_html_parser$HtmlParser_Util$toVirtualDom(_p7._2));
+		case 'Text':
+			return _elm_lang$html$Html$text(_p7._0);
+		default:
+			return _elm_lang$html$Html$text('');
+	}
+};
+var _jinjor$elm_html_parser$HtmlParser_Util$textContent = function (nodes) {
+	return A2(
+		_elm_lang$core$String$join,
+		'',
+		A2(_elm_lang$core$List$map, _jinjor$elm_html_parser$HtmlParser_Util$textContentEach, nodes));
+};
+var _jinjor$elm_html_parser$HtmlParser_Util$textContentEach = function (node) {
+	var _p9 = node;
+	switch (_p9.ctor) {
+		case 'Element':
+			return _jinjor$elm_html_parser$HtmlParser_Util$textContent(_p9._2);
+		case 'Text':
+			return _p9._0;
+		default:
+			return '';
+	}
+};
+var _jinjor$elm_html_parser$HtmlParser_Util$getValue = F2(
+	function (targetName, attrs) {
+		getValue:
+		while (true) {
+			var _p10 = attrs;
+			if (_p10.ctor === '[]') {
+				return _elm_lang$core$Maybe$Nothing;
+			} else {
+				if (_elm_lang$core$Native_Utils.eq(_p10._0._0, targetName)) {
+					return _elm_lang$core$Maybe$Just(_p10._0._1);
+				} else {
+					var _v6 = targetName,
+						_v7 = _p10._1;
+					targetName = _v6;
+					attrs = _v7;
+					continue getValue;
+				}
+			}
+		}
+	});
+var _jinjor$elm_html_parser$HtmlParser_Util$getId = function (attrs) {
+	return A2(_jinjor$elm_html_parser$HtmlParser_Util$getValue, 'id', attrs);
+};
+var _jinjor$elm_html_parser$HtmlParser_Util$getClassList = function (attrs) {
+	var _p11 = A2(_jinjor$elm_html_parser$HtmlParser_Util$getValue, 'class', attrs);
+	if (_p11.ctor === 'Nothing') {
+		return {ctor: '[]'};
+	} else {
+		return _elm_lang$core$String$words(_p11._0);
+	}
+};
+var _jinjor$elm_html_parser$HtmlParser_Util$filterMapElements = F2(
+	function (f, nodes) {
+		return A2(
+			_elm_lang$core$List$filterMap,
+			function (node) {
+				var _p12 = node;
+				if (_p12.ctor === 'Element') {
+					return A3(f, _p12._0, _p12._1, _p12._2);
+				} else {
+					return _elm_lang$core$Maybe$Nothing;
+				}
+			},
+			nodes);
+	});
+var _jinjor$elm_html_parser$HtmlParser_Util$filterElements = F2(
+	function (f, nodes) {
+		return A2(
+			_elm_lang$core$List$filter,
+			function (node) {
+				var _p13 = node;
+				if (_p13.ctor === 'Element') {
+					return A3(f, _p13._0, _p13._1, _p13._2);
+				} else {
+					return false;
+				}
+			},
+			nodes);
+	});
+var _jinjor$elm_html_parser$HtmlParser_Util$mapElements = F2(
+	function (f, nodes) {
+		return A2(
+			_elm_lang$core$List$filterMap,
+			function (node) {
+				var _p14 = node;
+				if (_p14.ctor === 'Element') {
+					return _elm_lang$core$Maybe$Just(
+						A3(f, _p14._0, _p14._1, _p14._2));
+				} else {
+					return _elm_lang$core$Maybe$Nothing;
+				}
+			},
+			nodes);
+	});
+var _jinjor$elm_html_parser$HtmlParser_Util$foldlWithBreak = F3(
+	function (f, b, list) {
+		foldlWithBreak:
+		while (true) {
+			var _p15 = list;
+			if (_p15.ctor === '[]') {
+				return b;
+			} else {
+				var _p16 = A2(f, _p15._0, b);
+				if (_p16._1 === true) {
+					return _p16._0;
+				} else {
+					var _v14 = f,
+						_v15 = _p16._0,
+						_v16 = _p15._1;
+					f = _v14;
+					b = _v15;
+					list = _v16;
+					continue foldlWithBreak;
+				}
+			}
+		}
+	});
+var _jinjor$elm_html_parser$HtmlParser_Util$findElements = F2(
+	function (match, nodes) {
+		var f = F2(
+			function (node, results) {
+				var _p17 = node;
+				if (_p17.ctor === 'Element') {
+					var _p18 = _p17._2;
+					return A2(match, _p17._0, _p17._1) ? A2(
+						_elm_lang$core$Basics_ops['++'],
+						results,
+						{
+							ctor: '::',
+							_0: node,
+							_1: A2(_jinjor$elm_html_parser$HtmlParser_Util$findElements, match, _p18)
+						}) : A2(
+						_elm_lang$core$Basics_ops['++'],
+						results,
+						A2(_jinjor$elm_html_parser$HtmlParser_Util$findElements, match, _p18));
+				} else {
+					return results;
+				}
+			});
+		return A3(
+			_elm_lang$core$List$foldl,
+			f,
+			{ctor: '[]'},
+			nodes);
+	});
+var _jinjor$elm_html_parser$HtmlParser_Util$findElement = F2(
+	function (match, nodes) {
+		var f = F2(
+			function (node, _p19) {
+				var _p20 = node;
+				if (_p20.ctor === 'Element') {
+					if (A2(match, _p20._0, _p20._1)) {
+						return {
+							ctor: '_Tuple2',
+							_0: {
+								ctor: '::',
+								_0: node,
+								_1: {ctor: '[]'}
+							},
+							_1: true
+						};
+					} else {
+						var _p21 = A2(_jinjor$elm_html_parser$HtmlParser_Util$findElement, match, _p20._2);
+						if (_p21.ctor === '[]') {
+							return {
+								ctor: '_Tuple2',
+								_0: {ctor: '[]'},
+								_1: false
+							};
+						} else {
+							return {ctor: '_Tuple2', _0: _p21, _1: true};
+						}
+					}
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: {ctor: '[]'},
+						_1: false
+					};
+				}
+			});
+		return A3(
+			_jinjor$elm_html_parser$HtmlParser_Util$foldlWithBreak,
+			f,
+			{ctor: '[]'},
+			nodes);
+	});
+var _jinjor$elm_html_parser$HtmlParser_Util$updateListDict = F3(
+	function (key, value, dict) {
+		return A3(
+			_elm_lang$core$Dict$update,
+			key,
+			function (v) {
+				var _p22 = v;
+				if (_p22.ctor === 'Just') {
+					return _elm_lang$core$Maybe$Just(
+						{ctor: '::', _0: value, _1: _p22._0});
+				} else {
+					return _elm_lang$core$Maybe$Just(
+						{
+							ctor: '::',
+							_0: value,
+							_1: {ctor: '[]'}
+						});
+				}
+			},
+			dict);
+	});
+var _jinjor$elm_html_parser$HtmlParser_Util$mergeListDict = F2(
+	function (d1, d2) {
+		return A3(
+			_elm_lang$core$Dict$foldl,
+			F3(
+				function (k2, v2, d1) {
+					return A3(
+						_elm_lang$core$Dict$update,
+						k2,
+						function (v1) {
+							var _p23 = v1;
+							if (_p23.ctor === 'Just') {
+								return _elm_lang$core$Maybe$Just(
+									A2(_elm_lang$core$Basics_ops['++'], _p23._0, v2));
+							} else {
+								return _elm_lang$core$Maybe$Just(v2);
+							}
+						},
+						d1);
+				}),
+			d1,
+			d2);
+	});
+var _jinjor$elm_html_parser$HtmlParser_Util$updateClassDict = F3(
+	function (node, $class, dict) {
+		return A3(_jinjor$elm_html_parser$HtmlParser_Util$updateListDict, $class, node, dict);
+	});
+var _jinjor$elm_html_parser$HtmlParser_Util$updateTagDict = F3(
+	function (node, tagName, dict) {
+		return A3(_jinjor$elm_html_parser$HtmlParser_Util$updateListDict, tagName, node, dict);
+	});
+var _jinjor$elm_html_parser$HtmlParser_Util$updateIdDict = F3(
+	function (node, id, dict) {
+		return A3(_jinjor$elm_html_parser$HtmlParser_Util$updateListDict, id, node, dict);
+	});
+var _jinjor$elm_html_parser$HtmlParser_Util$createClassDict = function (nodes) {
+	var f = F2(
+		function (node, dict) {
+			var _p24 = node;
+			if (_p24.ctor === 'Element') {
+				return A3(
+					_elm_lang$core$List$foldl,
+					_jinjor$elm_html_parser$HtmlParser_Util$updateClassDict(node),
+					A2(
+						_jinjor$elm_html_parser$HtmlParser_Util$mergeListDict,
+						_jinjor$elm_html_parser$HtmlParser_Util$createClassDict(_p24._2),
+						dict),
+					_jinjor$elm_html_parser$HtmlParser_Util$getClassList(_p24._1));
+			} else {
+				return dict;
+			}
+		});
+	return A3(_elm_lang$core$List$foldr, f, _elm_lang$core$Dict$empty, nodes);
+};
+var _jinjor$elm_html_parser$HtmlParser_Util$createTagDict = function (nodes) {
+	var f = F2(
+		function (node, dict) {
+			var _p25 = node;
+			if (_p25.ctor === 'Element') {
+				return A3(
+					_jinjor$elm_html_parser$HtmlParser_Util$updateTagDict,
+					node,
+					_p25._0,
+					A2(
+						_jinjor$elm_html_parser$HtmlParser_Util$mergeListDict,
+						_jinjor$elm_html_parser$HtmlParser_Util$createTagDict(_p25._2),
+						dict));
+			} else {
+				return dict;
+			}
+		});
+	return A3(_elm_lang$core$List$foldr, f, _elm_lang$core$Dict$empty, nodes);
+};
+var _jinjor$elm_html_parser$HtmlParser_Util$createIdDict = function (nodes) {
+	var f = F2(
+		function (node, dict) {
+			var _p26 = node;
+			if (_p26.ctor === 'Element') {
+				return function () {
+					var _p27 = A2(_jinjor$elm_html_parser$HtmlParser_Util$getValue, 'id', _p26._1);
+					if (_p27.ctor === 'Just') {
+						return A2(_jinjor$elm_html_parser$HtmlParser_Util$updateIdDict, node, _p27._0);
+					} else {
+						return _elm_lang$core$Basics$identity;
+					}
+				}()(
+					A2(
+						_jinjor$elm_html_parser$HtmlParser_Util$mergeListDict,
+						_jinjor$elm_html_parser$HtmlParser_Util$createIdDict(_p26._2),
+						dict));
+			} else {
+				return dict;
+			}
+		});
+	return A3(_elm_lang$core$List$foldl, f, _elm_lang$core$Dict$empty, nodes);
+};
+var _jinjor$elm_html_parser$HtmlParser_Util$matchesToClass = F2(
+	function (targetClassNames, attrs) {
+		return A2(
+			_elm_lang$core$List$all,
+			A2(
+				_elm_lang$core$Basics$flip,
+				_elm_lang$core$List$member,
+				_jinjor$elm_html_parser$HtmlParser_Util$getClassList(attrs)),
+			targetClassNames);
+	});
+var _jinjor$elm_html_parser$HtmlParser_Util$matchesToId = F2(
+	function (targetId, attrs) {
+		return _elm_lang$core$Native_Utils.eq(
+			A2(_jinjor$elm_html_parser$HtmlParser_Util$getValue, 'id', attrs),
+			_elm_lang$core$Maybe$Just(targetId));
+	});
+var _jinjor$elm_html_parser$HtmlParser_Util$getElementsByClassName = F2(
+	function (targetClassNames, nodes) {
+		return A2(
+			_jinjor$elm_html_parser$HtmlParser_Util$findElements,
+			F2(
+				function (_p28, attrs) {
+					return A2(_jinjor$elm_html_parser$HtmlParser_Util$matchesToClass, targetClassNames, attrs);
+				}),
+			nodes);
+	});
+var _jinjor$elm_html_parser$HtmlParser_Util$getElementsByTagName = F2(
+	function (tagName, nodes) {
+		var targetTagName = _elm_lang$core$String$toLower(tagName);
+		var match = F2(
+			function (tagName, _p29) {
+				return _elm_lang$core$Native_Utils.eq(tagName, targetTagName);
+			});
+		return A2(_jinjor$elm_html_parser$HtmlParser_Util$findElements, match, nodes);
+	});
+var _jinjor$elm_html_parser$HtmlParser_Util$getElementById = F2(
+	function (targetId, nodes) {
+		return A2(
+			_jinjor$elm_html_parser$HtmlParser_Util$findElement,
+			F2(
+				function (_p30, attrs) {
+					return A2(_jinjor$elm_html_parser$HtmlParser_Util$matchesToId, targetId, attrs);
+				}),
+			nodes);
+	});

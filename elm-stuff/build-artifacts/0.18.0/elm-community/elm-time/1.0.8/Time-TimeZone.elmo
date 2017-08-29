@@ -1,0 +1,321 @@
+var _elm_community$elm_time$Time_TimeZone_ops = _elm_community$elm_time$Time_TimeZone_ops || {};
+_elm_community$elm_time$Time_TimeZone_ops['!!'] = F2(
+	function (xs, i) {
+		var _p0 = _elm_lang$core$List$head(
+			A2(_elm_lang$core$List$drop, i, xs));
+		if (_p0.ctor === 'Nothing') {
+			return _elm_lang$core$Native_Utils.crashCase(
+				'Time.TimeZone',
+				{
+					start: {line: 296, column: 5},
+					end: {line: 301, column: 14}
+				},
+				_p0)(
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'index too large: xs=',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_lang$core$Basics$toString(xs),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							' i=',
+							_elm_lang$core$Basics$toString(i)))));
+		} else {
+			return _p0._0;
+		}
+	});
+var _elm_community$elm_time$Time_TimeZone$unsafeBase60 = F3(
+	function (sign, whole, frac) {
+		var toNum = function (c) {
+			var n = _elm_lang$core$Basics$toFloat(
+				_elm_lang$core$Char$toCode(c));
+			return (_elm_lang$core$Native_Utils.cmp(n, 96) > 0) ? (n - 87) : ((_elm_lang$core$Native_Utils.cmp(n, 64) > 0) ? (n - 29) : (n - 48));
+		};
+		var toWhole = F2(
+			function (cs, acc) {
+				toWhole:
+				while (true) {
+					var _p2 = cs;
+					if (_p2.ctor === '[]') {
+						return acc;
+					} else {
+						var _v2 = _p2._1,
+							_v3 = (60 * acc) + toNum(_p2._0);
+						cs = _v2;
+						acc = _v3;
+						continue toWhole;
+					}
+				}
+			});
+		var toFrac = F3(
+			function (cs, mul, acc) {
+				toFrac:
+				while (true) {
+					var mul_ = mul / 60;
+					var _p3 = cs;
+					if (_p3.ctor === '[]') {
+						return acc;
+					} else {
+						var _v5 = _p3._1,
+							_v6 = mul_,
+							_v7 = acc + (mul_ * toNum(_p3._0));
+						cs = _v5;
+						mul = _v6;
+						acc = _v7;
+						continue toFrac;
+					}
+				}
+			});
+		return A2(
+			F2(
+				function (x, y) {
+					return x * y;
+				}),
+			_elm_lang$core$Basics$toFloat(sign),
+			A3(
+				toFrac,
+				_elm_lang$core$String$toList(frac),
+				1,
+				A2(
+					toWhole,
+					_elm_lang$core$String$toList(whole),
+					0)));
+	});
+var _elm_community$elm_time$Time_TimeZone$base60String = _Bogdanp$elm_combine$Combine$regex('[0-9a-zA-Z]+');
+var _elm_community$elm_time$Time_TimeZone$base60 = function () {
+	var convert = function (_p4) {
+		var _p5 = _p4;
+		var _p7 = _p5._1;
+		var _p6 = _p5._2;
+		return (_elm_lang$core$Native_Utils.eq(_p7, '') && _elm_lang$core$Native_Utils.eq(_p6, '')) ? _Bogdanp$elm_combine$Combine$fail('expected an alphanumeric character or .') : _Bogdanp$elm_combine$Combine$succeed(
+			A3(_elm_community$elm_time$Time_TimeZone$unsafeBase60, _p5._0, _p7, _p6));
+	};
+	var decode = A2(
+		_Bogdanp$elm_combine$Combine_ops['<*>'],
+		A2(
+			_Bogdanp$elm_combine$Combine_ops['<*>'],
+			A2(
+				_Bogdanp$elm_combine$Combine_ops['<$>'],
+				F3(
+					function (v0, v1, v2) {
+						return {ctor: '_Tuple3', _0: v0, _1: v1, _2: v2};
+					}),
+				_Bogdanp$elm_combine$Combine_Num$sign),
+			A2(_Bogdanp$elm_combine$Combine$optional, '', _elm_community$elm_time$Time_TimeZone$base60String)),
+		A2(
+			_Bogdanp$elm_combine$Combine$optional,
+			'',
+			A2(
+				_Bogdanp$elm_combine$Combine_ops['*>'],
+				_Bogdanp$elm_combine$Combine$string('.'),
+				_elm_community$elm_time$Time_TimeZone$base60String)));
+	return A2(_Bogdanp$elm_combine$Combine_ops['>>='], decode, convert);
+}();
+var _elm_community$elm_time$Time_TimeZone$name = function (_p8) {
+	var _p9 = _p8;
+	return _p9._0.name;
+};
+var _elm_community$elm_time$Time_TimeZone$find = F2(
+	function (time, spans) {
+		var go = function (xs) {
+			go:
+			while (true) {
+				var _p10 = xs;
+				if (_p10.ctor === '[]') {
+					return _elm_lang$core$Native_Utils.crashCase(
+						'Time.TimeZone',
+						{
+							start: {line: 100, column: 13},
+							end: {line: 108, column: 30}
+						},
+						_p10)('find: invalid span list');
+				} else {
+					var _p12 = _p10._0;
+					if ((_elm_lang$core$Native_Utils.cmp(time, _p12.from) > -1) && (_elm_lang$core$Native_Utils.cmp(time, _p12.until) < 0)) {
+						return _p12;
+					} else {
+						var _v11 = _p10._1;
+						xs = _v11;
+						continue go;
+					}
+				}
+			}
+		};
+		return go(spans);
+	});
+var _elm_community$elm_time$Time_TimeZone$offset = F2(
+	function (time, _p13) {
+		var _p14 = _p13;
+		return function (_) {
+			return _.offset;
+		}(
+			A2(_elm_community$elm_time$Time_TimeZone$find, time, _p14._0.spans));
+	});
+var _elm_community$elm_time$Time_TimeZone$offsetString = F2(
+	function (time, timeZone) {
+		var utcOffset = (A2(_elm_community$elm_time$Time_TimeZone$offset, time, timeZone) / _elm_community$elm_time$Time_Internal$minuteMs) | 0;
+		var hours = (_elm_lang$core$Basics$abs(utcOffset) / 60) | 0;
+		var minutes = A2(
+			_elm_lang$core$Basics_ops['%'],
+			_elm_lang$core$Basics$abs(utcOffset),
+			60);
+		var string = A2(
+			_elm_lang$core$Basics_ops['++'],
+			_elm_community$elm_time$Time_Internal$padded(hours),
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				':',
+				_elm_community$elm_time$Time_Internal$padded(minutes)));
+		return (_elm_lang$core$Native_Utils.cmp(utcOffset, 0) < 1) ? A2(_elm_lang$core$Basics_ops['++'], '+', string) : A2(_elm_lang$core$Basics_ops['++'], '-', string);
+	});
+var _elm_community$elm_time$Time_TimeZone$abbreviation = F2(
+	function (time, _p15) {
+		var _p16 = _p15;
+		return function (_) {
+			return _.abbreviation;
+		}(
+			A2(_elm_community$elm_time$Time_TimeZone$find, time, _p16._0.spans));
+	});
+var _elm_community$elm_time$Time_TimeZone$Span = F4(
+	function (a, b, c, d) {
+		return {from: a, until: b, abbreviation: c, offset: d};
+	});
+var _elm_community$elm_time$Time_TimeZone$PackedTimeZone = F5(
+	function (a, b, c, d, e) {
+		return {name: a, abbrevs: b, offsets: c, indices: d, diffs: e};
+	});
+var _elm_community$elm_time$Time_TimeZone$TimeZone = function (a) {
+	return {ctor: 'TimeZone', _0: a};
+};
+var _elm_community$elm_time$Time_TimeZone$setName = F2(
+	function (name, _p17) {
+		var _p18 = _p17;
+		return _elm_community$elm_time$Time_TimeZone$TimeZone(
+			_elm_lang$core$Native_Utils.update(
+				_p18._0,
+				{name: name}));
+	});
+var _elm_community$elm_time$Time_TimeZone$packedTimeZone = function () {
+	var span = F4(
+		function (times, data, i, idx) {
+			return {
+				from: A2(_elm_community$elm_time$Time_TimeZone_ops['!!'], times, i),
+				until: A2(_elm_community$elm_time$Time_TimeZone_ops['!!'], times, i + 1),
+				abbreviation: A2(_elm_community$elm_time$Time_TimeZone_ops['!!'], data.abbrevs, idx),
+				offset: _elm_lang$core$Basics$round(
+					A2(_elm_community$elm_time$Time_TimeZone_ops['!!'], data.offsets, idx) * _elm_community$elm_time$Time_Internal$minuteMs)
+			};
+		});
+	var convert = function (data) {
+		var times = (!_elm_lang$core$List$isEmpty(data.diffs)) ? A3(
+			_elm_lang$core$List$scanl,
+			F2(
+				function (x, y) {
+					return x + y;
+				}),
+			A2(_elm_community$elm_time$Time_TimeZone_ops['!!'], data.diffs, 0),
+			A2(_elm_lang$core$List$drop, 1, data.diffs)) : {ctor: '[]'};
+		var paddedTimes = A2(
+			_elm_lang$core$Basics_ops['++'],
+			{
+				ctor: '::',
+				_0: -1 / 0,
+				_1: {ctor: '[]'}
+			},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				times,
+				{
+					ctor: '::',
+					_0: 1 / 0,
+					_1: {ctor: '[]'}
+				}));
+		return _elm_community$elm_time$Time_TimeZone$TimeZone(
+			{
+				name: data.name,
+				spans: A2(
+					_elm_lang$core$List$indexedMap,
+					A2(span, paddedTimes, data),
+					data.indices)
+			});
+	};
+	var validate = function (data) {
+		var maxIndex = A2(
+			_elm_lang$core$Maybe$withDefault,
+			0,
+			_elm_lang$core$List$maximum(data.indices));
+		var offsets = _elm_lang$core$List$length(data.offsets);
+		var abbrevs = _elm_lang$core$List$length(data.abbrevs);
+		return (!_elm_lang$core$Native_Utils.eq(abbrevs, offsets)) ? _Bogdanp$elm_combine$Combine$fail('abbrevs and offsets have different lengths') : ((_elm_lang$core$Native_Utils.cmp(maxIndex, abbrevs) > -1) ? _Bogdanp$elm_combine$Combine$fail('highest index is longer than both abbrevs and offsets') : _Bogdanp$elm_combine$Combine$succeed(data));
+	};
+	var diffs = A2(
+		_Bogdanp$elm_combine$Combine_ops['<$>'],
+		_elm_lang$core$List$map(
+			F2(
+				function (x, y) {
+					return x * y;
+				})(60000)),
+		A2(
+			_Bogdanp$elm_combine$Combine$sepBy,
+			_Bogdanp$elm_combine$Combine$string(' '),
+			_elm_community$elm_time$Time_TimeZone$base60));
+	var indices = A2(
+		_Bogdanp$elm_combine$Combine_ops['<*'],
+		A2(
+			_Bogdanp$elm_combine$Combine_ops['<$>'],
+			function (s) {
+				return A2(
+					_elm_lang$core$List$map,
+					function (n) {
+						return _elm_lang$core$Basics$floor(
+							A3(_elm_community$elm_time$Time_TimeZone$unsafeBase60, 1, n, ''));
+					},
+					A2(_elm_lang$core$String$split, '', s));
+			},
+			_Bogdanp$elm_combine$Combine$regex('[^|]+')),
+		_Bogdanp$elm_combine$Combine$string('|'));
+	var offsets = A2(
+		_Bogdanp$elm_combine$Combine_ops['<*'],
+		A2(
+			_Bogdanp$elm_combine$Combine$sepBy1,
+			_Bogdanp$elm_combine$Combine$string(' '),
+			_elm_community$elm_time$Time_TimeZone$base60),
+		_Bogdanp$elm_combine$Combine$string('|'));
+	var abbrevs = A2(
+		_Bogdanp$elm_combine$Combine_ops['<*'],
+		A2(
+			_Bogdanp$elm_combine$Combine$sepBy1,
+			_Bogdanp$elm_combine$Combine$string(' '),
+			_Bogdanp$elm_combine$Combine$regex('[^ |]+')),
+		_Bogdanp$elm_combine$Combine$string('|'));
+	var name = A2(
+		_Bogdanp$elm_combine$Combine_ops['<*'],
+		_Bogdanp$elm_combine$Combine$regex('[^|]+'),
+		_Bogdanp$elm_combine$Combine$string('|'));
+	var decode = A2(
+		_Bogdanp$elm_combine$Combine_ops['<*>'],
+		A2(
+			_Bogdanp$elm_combine$Combine_ops['<*>'],
+			A2(
+				_Bogdanp$elm_combine$Combine_ops['<*>'],
+				A2(
+					_Bogdanp$elm_combine$Combine_ops['<*>'],
+					A2(_Bogdanp$elm_combine$Combine_ops['<$>'], _elm_community$elm_time$Time_TimeZone$PackedTimeZone, name),
+					abbrevs),
+				offsets),
+			indices),
+		diffs);
+	return A2(
+		_Bogdanp$elm_combine$Combine_ops['<$>'],
+		convert,
+		A2(_Bogdanp$elm_combine$Combine_ops['>>='], decode, validate));
+}();
+var _elm_community$elm_time$Time_TimeZone$unpack = function (data) {
+	var _p19 = A2(_Bogdanp$elm_combine$Combine$parse, _elm_community$elm_time$Time_TimeZone$packedTimeZone, data);
+	if (_p19.ctor === 'Ok') {
+		return _elm_lang$core$Result$Ok(_p19._0._2);
+	} else {
+		return _elm_lang$core$Result$Err(_p19._0._2);
+	}
+};

@@ -1,0 +1,89 @@
+var _elm_community$elm_time$Time_Internal$digitsInRange = F3(
+	function (digitsToParse, lo, hi) {
+		var failure = _Bogdanp$elm_combine$Combine$fail(
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'expected ',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(digitsToParse),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						' digits in the range [',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(lo),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								', ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_elm_lang$core$Basics$toString(hi),
+									']')))))));
+		return A2(
+			_Bogdanp$elm_combine$Combine$andThen,
+			function (digits) {
+				var _p0 = _elm_lang$core$String$toInt(digits);
+				if (_p0.ctor === 'Ok') {
+					var _p1 = _p0._0;
+					return ((_elm_lang$core$Native_Utils.cmp(_p1, lo) > -1) && (_elm_lang$core$Native_Utils.cmp(_p1, hi) < 1)) ? _Bogdanp$elm_combine$Combine$succeed(_p1) : failure;
+				} else {
+					return failure;
+				}
+			},
+			_Bogdanp$elm_combine$Combine$regex(
+				A2(_elm_lang$core$String$repeat, digitsToParse, '\\d')));
+	});
+var _elm_community$elm_time$Time_Internal$paddedInt = A2(
+	_Bogdanp$elm_combine$Combine_ops['*>'],
+	A2(
+		_Bogdanp$elm_combine$Combine$optional,
+		'',
+		_Bogdanp$elm_combine$Combine$string('0')),
+	_Bogdanp$elm_combine$Combine_Num$int);
+var _elm_community$elm_time$Time_Internal$intRange = F2(
+	function (lo, hi) {
+		var validate = function (n) {
+			return ((_elm_lang$core$Native_Utils.cmp(n, lo) > -1) && (_elm_lang$core$Native_Utils.cmp(n, hi) < 1)) ? _Bogdanp$elm_combine$Combine$succeed(n) : _Bogdanp$elm_combine$Combine$fail(
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'expected an integer in the range [',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_lang$core$Basics$toString(lo),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							', ',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_elm_lang$core$Basics$toString(hi),
+								']')))));
+		};
+		return A2(_Bogdanp$elm_combine$Combine_ops['>>='], _elm_community$elm_time$Time_Internal$paddedInt, validate);
+	});
+var _elm_community$elm_time$Time_Internal$secondMs = 1000;
+var _elm_community$elm_time$Time_Internal$minuteMs = 60000;
+var _elm_community$elm_time$Time_Internal$hourMs = 3600000;
+var _elm_community$elm_time$Time_Internal$dayMs = 86400000;
+var _elm_community$elm_time$Time_Internal$padded3 = function (n) {
+	return A3(
+		_elm_lang$core$String$padLeft,
+		3,
+		_elm_lang$core$Native_Utils.chr('0'),
+		_elm_lang$core$Basics$toString(n));
+};
+var _elm_community$elm_time$Time_Internal$padded = function (n) {
+	return (_elm_lang$core$Native_Utils.cmp(n, 10) < 0) ? A2(
+		_elm_lang$core$Basics_ops['++'],
+		'0',
+		_elm_lang$core$Basics$toString(n)) : _elm_lang$core$Basics$toString(n);
+};
+var _elm_community$elm_time$Time_Internal$zero = {year: 0, month: 1, day: 1, hour: 0, minute: 0, second: 0, millisecond: 0};
+var _elm_community$elm_time$Time_Internal$offsetFromTimeData = function (_p2) {
+	var _p3 = _p2;
+	return (((A3(_elm_lang$core$Basics$clamp, 0, 23, _p3.hour) * _elm_community$elm_time$Time_Internal$hourMs) + (A3(_elm_lang$core$Basics$clamp, 0, 59, _p3.minute) * _elm_community$elm_time$Time_Internal$minuteMs)) + (A3(_elm_lang$core$Basics$clamp, 0, 59, _p3.second) * _elm_community$elm_time$Time_Internal$secondMs)) + A3(_elm_lang$core$Basics$clamp, 0, 999, _p3.millisecond);
+};
+var _elm_community$elm_time$Time_Internal$DateTimeData = F7(
+	function (a, b, c, d, e, f, g) {
+		return {year: a, month: b, day: c, hour: d, minute: e, second: f, millisecond: g};
+	});

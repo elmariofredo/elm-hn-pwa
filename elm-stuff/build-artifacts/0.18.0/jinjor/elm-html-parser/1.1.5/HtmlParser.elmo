@@ -1,0 +1,695 @@
+var _jinjor$elm_html_parser$HtmlParser$attributeValueEntityString = function (quote) {
+	return _Bogdanp$elm_combine$Combine$regex(
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'[^<&',
+			A2(_elm_lang$core$Basics_ops['++'], quote, ']*')));
+};
+var _jinjor$elm_html_parser$HtmlParser$textNodeNonEntityString = _Bogdanp$elm_combine$Combine$regex('[^<&]*');
+var _jinjor$elm_html_parser$HtmlParser$entityStringDec = A2(
+	_Bogdanp$elm_combine$Combine_ops['<$>'],
+	function (num) {
+		return A2(
+			_elm_lang$core$Result$withDefault,
+			num,
+			A2(
+				_elm_lang$core$Result$map,
+				function (_p0) {
+					return _elm_lang$core$String$fromList(
+						_elm_lang$core$List$singleton(
+							_elm_lang$core$Char$fromCode(_p0)));
+				},
+				_elm_lang$core$String$toInt(
+					A2(
+						_elm_lang$core$String$dropRight,
+						1,
+						A2(_elm_lang$core$String$dropLeft, 2, num)))));
+	},
+	_Bogdanp$elm_combine$Combine$regex('&#[1-9]*[0-9]+;'));
+var _jinjor$elm_html_parser$HtmlParser$entityStringHex = A2(
+	_Bogdanp$elm_combine$Combine_ops['<$>'],
+	function (num) {
+		return A2(
+			_elm_lang$core$Result$withDefault,
+			num,
+			A2(
+				_elm_lang$core$Result$map,
+				function (_p1) {
+					return _elm_lang$core$String$fromList(
+						_elm_lang$core$List$singleton(
+							_elm_lang$core$Char$fromCode(_p1)));
+				},
+				_rtfeldman$hex$Hex$fromString(
+					_elm_lang$core$String$toLower(
+						A2(
+							_elm_lang$core$String$dropRight,
+							1,
+							A2(_elm_lang$core$String$dropLeft, 3, num))))));
+	},
+	_Bogdanp$elm_combine$Combine$regex('&#x[0-9A-F]+;'));
+var _jinjor$elm_html_parser$HtmlParser$entityString = A2(
+	_Bogdanp$elm_combine$Combine_ops['<$>'],
+	function (code) {
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			code,
+			A2(_elm_lang$core$Dict$get, code, _jinjor$elm_html_parser$Escape$dict));
+	},
+	_Bogdanp$elm_combine$Combine$regex('&[0-9a-zA-Z]+;'));
+var _jinjor$elm_html_parser$HtmlParser$attributeString = function (quote) {
+	return A2(
+		_Bogdanp$elm_combine$Combine_ops['<$>'],
+		function (list) {
+			return A2(_elm_lang$core$String$join, '', list);
+		},
+		_Bogdanp$elm_combine$Combine$many(
+			A2(
+				_Bogdanp$elm_combine$Combine_ops['<|>'],
+				_jinjor$elm_html_parser$HtmlParser$entityString,
+				A2(
+					_Bogdanp$elm_combine$Combine_ops['<|>'],
+					_jinjor$elm_html_parser$HtmlParser$entityStringHex,
+					A2(
+						_Bogdanp$elm_combine$Combine_ops['<|>'],
+						_jinjor$elm_html_parser$HtmlParser$entityStringDec,
+						A2(
+							_Bogdanp$elm_combine$Combine_ops['<|>'],
+							_Bogdanp$elm_combine$Combine$string('&'),
+							_jinjor$elm_html_parser$HtmlParser$attributeValueEntityString(quote)))))));
+};
+var _jinjor$elm_html_parser$HtmlParser$textNodeString = A2(
+	_Bogdanp$elm_combine$Combine_ops['<$>'],
+	function (list) {
+		return A2(_elm_lang$core$String$join, '', list);
+	},
+	_Bogdanp$elm_combine$Combine$many(
+		A2(
+			_Bogdanp$elm_combine$Combine_ops['<|>'],
+			_jinjor$elm_html_parser$HtmlParser$entityString,
+			A2(
+				_Bogdanp$elm_combine$Combine_ops['<|>'],
+				_jinjor$elm_html_parser$HtmlParser$entityStringHex,
+				A2(
+					_Bogdanp$elm_combine$Combine_ops['<|>'],
+					_jinjor$elm_html_parser$HtmlParser$entityStringDec,
+					A2(
+						_Bogdanp$elm_combine$Combine_ops['<|>'],
+						_Bogdanp$elm_combine$Combine$string('&'),
+						_jinjor$elm_html_parser$HtmlParser$textNodeNonEntityString))))));
+var _jinjor$elm_html_parser$HtmlParser$ngSetForP = _elm_lang$core$Set$fromList(
+	{
+		ctor: '::',
+		_0: 'address',
+		_1: {
+			ctor: '::',
+			_0: 'article',
+			_1: {
+				ctor: '::',
+				_0: 'aside',
+				_1: {
+					ctor: '::',
+					_0: 'blockquote',
+					_1: {
+						ctor: '::',
+						_0: 'details',
+						_1: {
+							ctor: '::',
+							_0: 'div',
+							_1: {
+								ctor: '::',
+								_0: 'dl',
+								_1: {
+									ctor: '::',
+									_0: 'fieldset',
+									_1: {
+										ctor: '::',
+										_0: 'figcaption',
+										_1: {
+											ctor: '::',
+											_0: 'figure',
+											_1: {
+												ctor: '::',
+												_0: 'footer',
+												_1: {
+													ctor: '::',
+													_0: 'form',
+													_1: {
+														ctor: '::',
+														_0: 'h1',
+														_1: {
+															ctor: '::',
+															_0: 'h2',
+															_1: {
+																ctor: '::',
+																_0: 'h3',
+																_1: {
+																	ctor: '::',
+																	_0: 'h4',
+																	_1: {
+																		ctor: '::',
+																		_0: 'h5',
+																		_1: {
+																			ctor: '::',
+																			_0: 'h6',
+																			_1: {
+																				ctor: '::',
+																				_0: 'header',
+																				_1: {
+																					ctor: '::',
+																					_0: 'hgroup',
+																					_1: {
+																						ctor: '::',
+																						_0: 'hr',
+																						_1: {
+																							ctor: '::',
+																							_0: 'main',
+																							_1: {
+																								ctor: '::',
+																								_0: 'menu',
+																								_1: {
+																									ctor: '::',
+																									_0: 'nav',
+																									_1: {
+																										ctor: '::',
+																										_0: 'ol',
+																										_1: {
+																											ctor: '::',
+																											_0: 'p',
+																											_1: {
+																												ctor: '::',
+																												_0: 'pre',
+																												_1: {
+																													ctor: '::',
+																													_0: 'section',
+																													_1: {
+																														ctor: '::',
+																														_0: 'table',
+																														_1: {
+																															ctor: '::',
+																															_0: 'ul',
+																															_1: {ctor: '[]'}
+																														}
+																													}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	});
+var _jinjor$elm_html_parser$HtmlParser$isInvalidNest = F2(
+	function (tagName, childTagName) {
+		return (_elm_lang$core$Native_Utils.eq(tagName, 'head') && _elm_lang$core$Native_Utils.eq(childTagName, 'body')) || ((_elm_lang$core$Native_Utils.eq(tagName, 'li') && _elm_lang$core$Native_Utils.eq(childTagName, 'li')) || ((_elm_lang$core$Native_Utils.eq(tagName, 'dt') && (_elm_lang$core$Native_Utils.eq(childTagName, 'dt') || _elm_lang$core$Native_Utils.eq(childTagName, 'dd'))) || ((_elm_lang$core$Native_Utils.eq(tagName, 'dd') && (_elm_lang$core$Native_Utils.eq(childTagName, 'dt') || _elm_lang$core$Native_Utils.eq(childTagName, 'dd'))) || ((_elm_lang$core$Native_Utils.eq(tagName, 'p') && A2(_elm_lang$core$Set$member, childTagName, _jinjor$elm_html_parser$HtmlParser$ngSetForP)) || ((_elm_lang$core$Native_Utils.eq(tagName, 'rt') && (_elm_lang$core$Native_Utils.eq(childTagName, 'rt') || _elm_lang$core$Native_Utils.eq(childTagName, 'rp'))) || ((_elm_lang$core$Native_Utils.eq(tagName, 'rp') && (_elm_lang$core$Native_Utils.eq(childTagName, 'rt') || _elm_lang$core$Native_Utils.eq(childTagName, 'rp'))) || ((_elm_lang$core$Native_Utils.eq(tagName, 'optgroup') && _elm_lang$core$Native_Utils.eq(childTagName, 'optgroup')) || ((_elm_lang$core$Native_Utils.eq(tagName, 'option') && (_elm_lang$core$Native_Utils.eq(childTagName, 'option') || _elm_lang$core$Native_Utils.eq(childTagName, 'optgroup'))) || ((_elm_lang$core$Native_Utils.eq(tagName, 'colgroup') && (!_elm_lang$core$Native_Utils.eq(childTagName, 'col'))) || (_elm_lang$core$Native_Utils.eq(tagName, 'caption') || ((_elm_lang$core$Native_Utils.eq(tagName, 'thead') && (_elm_lang$core$Native_Utils.eq(childTagName, 'tbody') || _elm_lang$core$Native_Utils.eq(childTagName, 'tfoot'))) || ((_elm_lang$core$Native_Utils.eq(tagName, 'tbody') && (_elm_lang$core$Native_Utils.eq(childTagName, 'tbody') || (_elm_lang$core$Native_Utils.eq(childTagName, 'tfoot') || _elm_lang$core$Native_Utils.eq(childTagName, 'table')))) || ((_elm_lang$core$Native_Utils.eq(tagName, 'tfoot') && _elm_lang$core$Native_Utils.eq(childTagName, 'table')) || ((_elm_lang$core$Native_Utils.eq(tagName, 'tr') && (_elm_lang$core$Native_Utils.eq(childTagName, 'tr') || (_elm_lang$core$Native_Utils.eq(childTagName, 'thead') || (_elm_lang$core$Native_Utils.eq(childTagName, 'tbody') || _elm_lang$core$Native_Utils.eq(childTagName, 'tfoot'))))) || ((_elm_lang$core$Native_Utils.eq(tagName, 'td') && (_elm_lang$core$Native_Utils.eq(childTagName, 'td') || (_elm_lang$core$Native_Utils.eq(childTagName, 'th') || (_elm_lang$core$Native_Utils.eq(childTagName, 'tr') || (_elm_lang$core$Native_Utils.eq(childTagName, 'tbody') || _elm_lang$core$Native_Utils.eq(childTagName, 'tfoot')))))) || (_elm_lang$core$Native_Utils.eq(tagName, 'th') && (_elm_lang$core$Native_Utils.eq(childTagName, 'td') || (_elm_lang$core$Native_Utils.eq(childTagName, 'th') || (_elm_lang$core$Native_Utils.eq(childTagName, 'tr') || (_elm_lang$core$Native_Utils.eq(childTagName, 'tbody') || _elm_lang$core$Native_Utils.eq(childTagName, 'tfoot')))))))))))))))))))));
+	});
+var _jinjor$elm_html_parser$HtmlParser$optionalEndTag = _elm_lang$core$Set$fromList(
+	{
+		ctor: '::',
+		_0: 'li',
+		_1: {
+			ctor: '::',
+			_0: 'dt',
+			_1: {
+				ctor: '::',
+				_0: 'dd',
+				_1: {
+					ctor: '::',
+					_0: 'p',
+					_1: {
+						ctor: '::',
+						_0: 'rt',
+						_1: {
+							ctor: '::',
+							_0: 'rp',
+							_1: {
+								ctor: '::',
+								_0: 'optgroup',
+								_1: {
+									ctor: '::',
+									_0: 'option',
+									_1: {
+										ctor: '::',
+										_0: 'colgroup',
+										_1: {
+											ctor: '::',
+											_0: 'caption',
+											_1: {
+												ctor: '::',
+												_0: 'thead',
+												_1: {
+													ctor: '::',
+													_0: 'tbody',
+													_1: {
+														ctor: '::',
+														_0: 'tfoot',
+														_1: {
+															ctor: '::',
+															_0: 'tr',
+															_1: {
+																ctor: '::',
+																_0: 'td',
+																_1: {
+																	ctor: '::',
+																	_0: 'th',
+																	_1: {ctor: '[]'}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	});
+var _jinjor$elm_html_parser$HtmlParser$startTagOnly = _elm_lang$core$Set$fromList(
+	{
+		ctor: '::',
+		_0: 'br',
+		_1: {
+			ctor: '::',
+			_0: 'img',
+			_1: {
+				ctor: '::',
+				_0: 'hr',
+				_1: {
+					ctor: '::',
+					_0: 'meta',
+					_1: {
+						ctor: '::',
+						_0: 'input',
+						_1: {
+							ctor: '::',
+							_0: 'embed',
+							_1: {
+								ctor: '::',
+								_0: 'area',
+								_1: {
+									ctor: '::',
+									_0: 'base',
+									_1: {
+										ctor: '::',
+										_0: 'col',
+										_1: {
+											ctor: '::',
+											_0: 'keygen',
+											_1: {
+												ctor: '::',
+												_0: 'link',
+												_1: {
+													ctor: '::',
+													_0: 'param',
+													_1: {
+														ctor: '::',
+														_0: 'source',
+														_1: {
+															ctor: '::',
+															_0: 'command',
+															_1: {
+																ctor: '::',
+																_0: 'link',
+																_1: {
+																	ctor: '::',
+																	_0: 'track',
+																	_1: {
+																		ctor: '::',
+																		_0: 'wbr',
+																		_1: {ctor: '[]'}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	});
+var _jinjor$elm_html_parser$HtmlParser$attributeBareValue = _Bogdanp$elm_combine$Combine$regex('[^ `\"\'<>=\n\r\t]+');
+var _jinjor$elm_html_parser$HtmlParser$attributeQuotedValue = A2(
+	_Bogdanp$elm_combine$Combine_ops['<|>'],
+	A3(
+		_Bogdanp$elm_combine$Combine$between,
+		_Bogdanp$elm_combine$Combine$string('\"'),
+		_Bogdanp$elm_combine$Combine$string('\"'),
+		_jinjor$elm_html_parser$HtmlParser$attributeString('\"')),
+	A3(
+		_Bogdanp$elm_combine$Combine$between,
+		_Bogdanp$elm_combine$Combine$string('\''),
+		_Bogdanp$elm_combine$Combine$string('\''),
+		_jinjor$elm_html_parser$HtmlParser$attributeString('\'')));
+var _jinjor$elm_html_parser$HtmlParser$attributeValue = A2(_Bogdanp$elm_combine$Combine_ops['<|>'], _jinjor$elm_html_parser$HtmlParser$attributeQuotedValue, _jinjor$elm_html_parser$HtmlParser$attributeBareValue);
+var _jinjor$elm_html_parser$HtmlParser$attributeName = A2(
+	_Bogdanp$elm_combine$Combine$map,
+	_elm_lang$core$String$toLower,
+	_Bogdanp$elm_combine$Combine$regex('[a-zA-Z][a-zA-Z0-9:\\-]*'));
+var _jinjor$elm_html_parser$HtmlParser$tagName = A2(
+	_Bogdanp$elm_combine$Combine$map,
+	_elm_lang$core$String$toLower,
+	_Bogdanp$elm_combine$Combine$regex('[a-zA-Z][a-zA-Z0-9\\-]*'));
+var _jinjor$elm_html_parser$HtmlParser$spaces1 = _Bogdanp$elm_combine$Combine$regex('[ \t\r\n]+');
+var _jinjor$elm_html_parser$HtmlParser$spaces = _Bogdanp$elm_combine$Combine$regex('[ \t\r\n]*');
+var _jinjor$elm_html_parser$HtmlParser$spaced = function (p) {
+	return A3(_Bogdanp$elm_combine$Combine$between, _jinjor$elm_html_parser$HtmlParser$spaces, _jinjor$elm_html_parser$HtmlParser$spaces, p);
+};
+var _jinjor$elm_html_parser$HtmlParser$attributeNameValuePair = A2(
+	_Bogdanp$elm_combine$Combine_ops['<*>'],
+	A2(
+		_Bogdanp$elm_combine$Combine_ops['<*>'],
+		A2(
+			_Bogdanp$elm_combine$Combine_ops['<$>'],
+			F3(
+				function (name, _p2, value) {
+					return {ctor: '_Tuple2', _0: name, _1: value};
+				}),
+			_jinjor$elm_html_parser$HtmlParser$attributeName),
+		A3(
+			_Bogdanp$elm_combine$Combine$between,
+			_jinjor$elm_html_parser$HtmlParser$spaces,
+			_jinjor$elm_html_parser$HtmlParser$spaces,
+			_Bogdanp$elm_combine$Combine$string('='))),
+	_jinjor$elm_html_parser$HtmlParser$attributeValue);
+var _jinjor$elm_html_parser$HtmlParser$attribute = A2(
+	_Bogdanp$elm_combine$Combine_ops['<|>'],
+	_jinjor$elm_html_parser$HtmlParser$attributeNameValuePair,
+	A2(
+		_Bogdanp$elm_combine$Combine$map,
+		A2(
+			_elm_lang$core$Basics$flip,
+			F2(
+				function (v0, v1) {
+					return {ctor: '_Tuple2', _0: v0, _1: v1};
+				}),
+			''),
+		_jinjor$elm_html_parser$HtmlParser$attributeName));
+var _jinjor$elm_html_parser$HtmlParser$startTag = A2(
+	_Bogdanp$elm_combine$Combine_ops['<*>'],
+	A2(
+		_Bogdanp$elm_combine$Combine_ops['<*>'],
+		A2(
+			_Bogdanp$elm_combine$Combine_ops['<*>'],
+			A2(
+				_Bogdanp$elm_combine$Combine_ops['<$>'],
+				F4(
+					function (_p4, tagName, attrs, _p3) {
+						return {ctor: '_Tuple2', _0: tagName, _1: attrs};
+					}),
+				_Bogdanp$elm_combine$Combine$string('<')),
+			_jinjor$elm_html_parser$HtmlParser$tagName),
+		A3(
+			_Bogdanp$elm_combine$Combine$between,
+			_jinjor$elm_html_parser$HtmlParser$spaces,
+			_jinjor$elm_html_parser$HtmlParser$spaces,
+			A2(_Bogdanp$elm_combine$Combine$sepBy, _jinjor$elm_html_parser$HtmlParser$spaces, _jinjor$elm_html_parser$HtmlParser$attribute))),
+	_Bogdanp$elm_combine$Combine$string('>'));
+var _jinjor$elm_html_parser$HtmlParser$generalEndTag = A2(
+	_Bogdanp$elm_combine$Combine_ops['<*>'],
+	A2(
+		_Bogdanp$elm_combine$Combine_ops['<*>'],
+		A2(
+			_Bogdanp$elm_combine$Combine_ops['<*>'],
+			A2(
+				_Bogdanp$elm_combine$Combine_ops['<$>'],
+				F4(
+					function (_p7, tagName, _p6, _p5) {
+						return tagName;
+					}),
+				_Bogdanp$elm_combine$Combine$string('</')),
+			_jinjor$elm_html_parser$HtmlParser$tagName),
+		_jinjor$elm_html_parser$HtmlParser$spaces),
+	_Bogdanp$elm_combine$Combine$string('>'));
+var _jinjor$elm_html_parser$HtmlParser$endTag = function (tagName) {
+	return A2(
+		_Bogdanp$elm_combine$Combine$andThen,
+		function (endTagName) {
+			return _elm_lang$core$Native_Utils.eq(tagName, endTagName) ? _Bogdanp$elm_combine$Combine$succeed(
+				{ctor: '_Tuple0'}) : _Bogdanp$elm_combine$Combine$fail('');
+		},
+		_jinjor$elm_html_parser$HtmlParser$generalEndTag);
+};
+var _jinjor$elm_html_parser$HtmlParser$singleTag = _Bogdanp$elm_combine$Combine$lazy(
+	function (_p8) {
+		return A2(
+			_Bogdanp$elm_combine$Combine_ops['<*>'],
+			A2(
+				_Bogdanp$elm_combine$Combine_ops['<*>'],
+				A2(
+					_Bogdanp$elm_combine$Combine_ops['<*>'],
+					A2(
+						_Bogdanp$elm_combine$Combine_ops['<$>'],
+						F4(
+							function (_p10, tagName, attrs, _p9) {
+								return {ctor: '_Tuple2', _0: tagName, _1: attrs};
+							}),
+						_Bogdanp$elm_combine$Combine$string('<')),
+					_jinjor$elm_html_parser$HtmlParser$tagName),
+				A3(
+					_Bogdanp$elm_combine$Combine$between,
+					_jinjor$elm_html_parser$HtmlParser$spaces,
+					_jinjor$elm_html_parser$HtmlParser$spaces,
+					A2(_Bogdanp$elm_combine$Combine$sepBy, _jinjor$elm_html_parser$HtmlParser$spaces, _jinjor$elm_html_parser$HtmlParser$attribute))),
+			_Bogdanp$elm_combine$Combine$string('/>'));
+	});
+var _jinjor$elm_html_parser$HtmlParser$Comment = function (a) {
+	return {ctor: 'Comment', _0: a};
+};
+var _jinjor$elm_html_parser$HtmlParser$untilCommentEnd = A2(
+	_Bogdanp$elm_combine$Combine$map,
+	_jinjor$elm_html_parser$HtmlParser$Comment,
+	A2(
+		_Bogdanp$elm_combine$Combine$map,
+		_elm_lang$core$String$fromList,
+		A2(
+			_Bogdanp$elm_combine$Combine$manyTill,
+			_Bogdanp$elm_combine$Combine_Char$anyChar,
+			_Bogdanp$elm_combine$Combine$string('-->'))));
+var _jinjor$elm_html_parser$HtmlParser$commentNode = A2(
+	_Bogdanp$elm_combine$Combine_ops['*>'],
+	_Bogdanp$elm_combine$Combine$string('<!--'),
+	_jinjor$elm_html_parser$HtmlParser$untilCommentEnd);
+var _jinjor$elm_html_parser$HtmlParser$Element = F3(
+	function (a, b, c) {
+		return {ctor: 'Element', _0: a, _1: b, _2: c};
+	});
+var _jinjor$elm_html_parser$HtmlParser$doctypeNode = A2(
+	_Bogdanp$elm_combine$Combine$map,
+	function (_p11) {
+		return A3(
+			_jinjor$elm_html_parser$HtmlParser$Element,
+			'!DOCTYPE',
+			{ctor: '[]'},
+			{ctor: '[]'});
+	},
+	_Bogdanp$elm_combine$Combine$regex('<!DOCTYPE [^>]*>'));
+var _jinjor$elm_html_parser$HtmlParser$singleNode = A2(
+	_Bogdanp$elm_combine$Combine$map,
+	function (_p12) {
+		var _p13 = _p12;
+		return A3(
+			_jinjor$elm_html_parser$HtmlParser$Element,
+			_p13._0,
+			_p13._1,
+			{ctor: '[]'});
+	},
+	_jinjor$elm_html_parser$HtmlParser$singleTag);
+var _jinjor$elm_html_parser$HtmlParser$Text = function (a) {
+	return {ctor: 'Text', _0: a};
+};
+var _jinjor$elm_html_parser$HtmlParser$textNode = A2(_Bogdanp$elm_combine$Combine$map, _jinjor$elm_html_parser$HtmlParser$Text, _jinjor$elm_html_parser$HtmlParser$textNodeString);
+var _jinjor$elm_html_parser$HtmlParser$untilScriptEnd = function (tagName) {
+	return _Bogdanp$elm_combine$Combine$lazy(
+		function (_p14) {
+			return A2(
+				_Bogdanp$elm_combine$Combine_ops['<$>'],
+				function (_p15) {
+					var _p16 = _p15;
+					var _p18 = _p16._0;
+					var _p17 = _p16._1;
+					return _elm_lang$core$Native_Utils.eq(_p18, '') ? _p17 : {
+						ctor: '::',
+						_0: _jinjor$elm_html_parser$HtmlParser$Text(_p18),
+						_1: _p17
+					};
+				},
+				_jinjor$elm_html_parser$HtmlParser$untilScriptEndHelp(tagName));
+		});
+};
+var _jinjor$elm_html_parser$HtmlParser$untilScriptEndHelp = function (tagName) {
+	return _Bogdanp$elm_combine$Combine$lazy(
+		function (_p19) {
+			return A2(
+				_Bogdanp$elm_combine$Combine$andThen,
+				function (s) {
+					return A2(
+						_Bogdanp$elm_combine$Combine_ops['<|>'],
+						A2(
+							_Bogdanp$elm_combine$Combine_ops['<*>'],
+							A2(
+								_Bogdanp$elm_combine$Combine_ops['<*>'],
+								A2(
+									_Bogdanp$elm_combine$Combine_ops['<$>'],
+									F3(
+										function (_p20, comment, rest) {
+											return {
+												ctor: '_Tuple2',
+												_0: s,
+												_1: {ctor: '::', _0: comment, _1: rest}
+											};
+										}),
+									_Bogdanp$elm_combine$Combine$string('<!--')),
+								_jinjor$elm_html_parser$HtmlParser$untilCommentEnd),
+							_jinjor$elm_html_parser$HtmlParser$untilScriptEnd(tagName)),
+						A2(
+							_Bogdanp$elm_combine$Combine_ops['<|>'],
+							A2(
+								_Bogdanp$elm_combine$Combine_ops['<$>'],
+								function (_p21) {
+									return {
+										ctor: '_Tuple2',
+										_0: s,
+										_1: {ctor: '[]'}
+									};
+								},
+								_jinjor$elm_html_parser$HtmlParser$endTag(tagName)),
+							A2(
+								_Bogdanp$elm_combine$Combine_ops['<*>'],
+								A2(
+									_Bogdanp$elm_combine$Combine_ops['<$>'],
+									F2(
+										function (lt, _p22) {
+											var _p23 = _p22;
+											return {
+												ctor: '_Tuple2',
+												_0: A2(
+													_elm_lang$core$Basics_ops['++'],
+													s,
+													A2(_elm_lang$core$Basics_ops['++'], lt, _p23._0)),
+												_1: _p23._1
+											};
+										}),
+									_Bogdanp$elm_combine$Combine$string('<')),
+								_jinjor$elm_html_parser$HtmlParser$untilScriptEndHelp(tagName))));
+				},
+				_Bogdanp$elm_combine$Combine$regex('[^<]*'));
+		});
+};
+var _jinjor$elm_html_parser$HtmlParser$normalNode = function (parentTagName) {
+	return _Bogdanp$elm_combine$Combine$lazy(
+		function (_p24) {
+			return A2(
+				_Bogdanp$elm_combine$Combine$andThen,
+				function (_p25) {
+					var _p26 = _p25;
+					var _p28 = _p26._0;
+					var _p27 = _p26._1;
+					return (_elm_lang$core$Native_Utils.eq(_p28, 'script') || _elm_lang$core$Native_Utils.eq(_p28, 'style')) ? A2(
+						_Bogdanp$elm_combine$Combine_ops['<$>'],
+						function (children) {
+							return A3(_jinjor$elm_html_parser$HtmlParser$Element, _p28, _p27, children);
+						},
+						_jinjor$elm_html_parser$HtmlParser$untilScriptEnd(_p28)) : (A2(_jinjor$elm_html_parser$HtmlParser$isInvalidNest, parentTagName, _p28) ? _Bogdanp$elm_combine$Combine$fail('') : (A2(_elm_lang$core$Set$member, _p28, _jinjor$elm_html_parser$HtmlParser$startTagOnly) ? _Bogdanp$elm_combine$Combine$succeed(
+						A3(
+							_jinjor$elm_html_parser$HtmlParser$Element,
+							_p28,
+							_p27,
+							{ctor: '[]'})) : A2(
+						_Bogdanp$elm_combine$Combine_ops['<$>'],
+						function (children) {
+							return A3(_jinjor$elm_html_parser$HtmlParser$Element, _p28, _p27, children);
+						},
+						_jinjor$elm_html_parser$HtmlParser$untilEndTag(_p28))));
+				},
+				_jinjor$elm_html_parser$HtmlParser$startTag);
+		});
+};
+var _jinjor$elm_html_parser$HtmlParser$untilEndTag = function (tagName) {
+	return _Bogdanp$elm_combine$Combine$lazy(
+		function (_p29) {
+			return A2(
+				_Bogdanp$elm_combine$Combine_ops['<*>'],
+				A2(
+					_Bogdanp$elm_combine$Combine_ops['<$>'],
+					F2(
+						function (children1, children2) {
+							return A2(_elm_lang$core$Basics_ops['++'], children1, children2);
+						}),
+					_Bogdanp$elm_combine$Combine$many(
+						_jinjor$elm_html_parser$HtmlParser$node(tagName))),
+				A2(
+					_Bogdanp$elm_combine$Combine$optional,
+					{ctor: '[]'},
+					A2(
+						_Bogdanp$elm_combine$Combine$andThen,
+						function (endTagName) {
+							return _elm_lang$core$Native_Utils.eq(tagName, endTagName) ? _Bogdanp$elm_combine$Combine$succeed(
+								{ctor: '[]'}) : _jinjor$elm_html_parser$HtmlParser$untilEndTag(tagName);
+						},
+						_jinjor$elm_html_parser$HtmlParser$generalEndTag)));
+		});
+};
+var _jinjor$elm_html_parser$HtmlParser$node = function (parentTagName) {
+	return _Bogdanp$elm_combine$Combine$lazy(
+		function (_p30) {
+			return A2(
+				_Bogdanp$elm_combine$Combine_ops['<|>'],
+				_jinjor$elm_html_parser$HtmlParser$doctypeNode,
+				A2(
+					_Bogdanp$elm_combine$Combine_ops['<|>'],
+					_jinjor$elm_html_parser$HtmlParser$singleNode,
+					A2(
+						_Bogdanp$elm_combine$Combine_ops['<|>'],
+						_jinjor$elm_html_parser$HtmlParser$normalNode(parentTagName),
+						A2(_Bogdanp$elm_combine$Combine_ops['<|>'], _jinjor$elm_html_parser$HtmlParser$commentNode, _jinjor$elm_html_parser$HtmlParser$textNode))));
+		});
+};
+var _jinjor$elm_html_parser$HtmlParser$nodesAndEnd = A2(
+	_Bogdanp$elm_combine$Combine_ops['<*>'],
+	A2(
+		_Bogdanp$elm_combine$Combine_ops['<$>'],
+		F2(
+			function (nodes, _p31) {
+				return nodes;
+			}),
+		_jinjor$elm_html_parser$HtmlParser$untilEndTag('')),
+	_Bogdanp$elm_combine$Combine$end);
+var _jinjor$elm_html_parser$HtmlParser$parse = function (s) {
+	var _p32 = A2(_Bogdanp$elm_combine$Combine$parse, _jinjor$elm_html_parser$HtmlParser$nodesAndEnd, s);
+	if (_p32.ctor === 'Ok') {
+		return _p32._0._2;
+	} else {
+		return {ctor: '[]'};
+	}
+};
