@@ -230,6 +230,13 @@ page feed =
             List.filter (\i -> i.id == byId) fromList 
                 |> head
 
+        kids : Item -> Maybe (List Item)
+        kids item =
+            if item.kids == Nothing then
+                Nothing
+            else
+                Dict.get item.id feed.comments
+
         {-- ***********************************
         I T E M   V I E W 
         ***************************************
@@ -253,9 +260,12 @@ page feed =
             else
                 story feed (index, item)
 
-
-        htmlData : List Item -> (Int, Item) -> Html Data
-        htmlData items (index, item) =
+        {-- ***********************************
+        K E Y E D   N O D E 
+        ***************************************
+        --}
+        htmlContent : List Item -> (Int, Item) -> Html Data
+        htmlContent items (index, item) =
             Lz.lazy (K.node "article"
                 [ id <| item.type_ ++ "-" ++ toString item.id
                 , class item.type_
@@ -269,7 +279,7 @@ page feed =
         knode : List Item -> (Int, Item) -> (String, Html Data)
         knode items (index, item) =
             ( toString index
-            , htmlData items (index, item)
+            , htmlContent items (index, item)
             )
 
         pushComment : List Item -> (Int, Item) -> List (Html Data) -> List (String, Html Data)
@@ -279,47 +289,47 @@ page feed =
                 c =
                     { parent = parent item.id items
                     , item = i
+                    , index = 0 + index 
                     , id = i.id
-                    , index = increment
-                    , kids = getChildComments i.id
-                    , comments = Comments []
+                    , kids = kids i
                     }
 
-                increment : Int
-                increment =
-                    if item.kids == Nothing then
-                        index + 1
-                    else
-                        0 + index
-
-                kids : List Item
-                kids = c.kids |> withDefault nolist
-
                 i : Item
-                i =
-                    Dict.get item.id feed.comments
-                        |> withDefault nolist
-                        |> drop index
-                        |> head
-                        |> withDefault item
+                i = Dict.get item.id feed.comments
+                    |> withDefault nolist
+                    |> drop index
+                    |> head
+                    |> withDefault item
 
-                getChildComments : Int -> Maybe (List Item)
-                getChildComments iid =
-                        Dict.get iid feed.comments
+                str : List (Html Data)
+                str = story feed (c.index, c.item)
 
-                iView : List (String, Html Data)
-                iView = parentHtml
-                    |> List.indexedMap (,)
-                    |> List.map (Tuple.mapFirst (\_ -> toString index))
+                content : List (String, Html Data)
+                content =
+                    case feed.page of
+                        SingleItem id ->
+                            List.append parentHtml str
+                                |> List.indexedMap (,)
+                                |> List.map (Tuple.mapFirst (\_ -> toString c.index))
+                        _ -> 
+                            parentHtml
+                                |> List.indexedMap (,)
+                                |> List.map (Tuple.mapFirst (\_ -> toString c.index))
 
-                n : List (String, Html Data)
-                n =
-                    if item.kids == Nothing then
-                        iView
-                    else
-                        (knode kids (c.index, c.item)) :: iView
+                nodes : List (String, Html Data)
+                nodes =
+                    case c.kids of
+                        Nothing ->
+                            content
+                        Just kids ->
+                            A.fromList content
+                                |> A.push (knode kids (c.index, c.item)) 
+                                |> A.toList
             in
-                n
+                nodes
+
+
+
 
 
         {-- ***********************************
@@ -693,10 +703,9 @@ type alias Comment =
     , index : Int
     , id : Int
     , kids: Maybe (List Item) 
-    , comments : Comments
     }
 
-type Comments = Comments (List Comment)
+type Comments = List Comment
 
 
 discuss : Feed -> Items -> Items 
