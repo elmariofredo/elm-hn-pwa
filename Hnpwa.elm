@@ -708,23 +708,6 @@ type alias Comment =
 type Comments = List Comment
 
 
-discuss : Feed -> Items -> Items 
-discuss feed comments =
-      RD.map2 append feed.data comments
-    --    |> RD.andThen RD.succeed
-
-
--- index of comments
--- keyed by their parent item id
-db : Int -> Items -> Feed -> Dict Int (List Item)
-db parentId comments feed =
-    case comments of
-        Success c ->
-            insert parentId c feed.comments
-
-        _ ->
-            feed.comments
-
 
 
 -- REQUESTS
@@ -927,24 +910,40 @@ item =
 
 update : Data -> Feed -> ( Feed, Cmd Data )
 update data feed =
-    case data of
-        FetchStories ids ->
-            ( { feed | data = Loading }, getItems ids )
+    let
+        discuss : Items -> Items 
+        discuss comments =
+            RD.map2 append feed.data comments
+        -- RD.andThen RD.succeed
 
-        FetchSingleItem (t, item) ->
-            ( { feed | data = item, now = t }, getKidsOfSeveral item )
+        -- index of comments
+        -- keyed by their parent item id
+        db : Int -> Items -> Dict Int (List Item)
+        db parentId comments =
+            case comments of
+                Success c ->
+                    insert parentId c feed.comments
+                _ ->
+                    feed.comments
+    in
+        case data of
+            FetchStories ids ->
+                ( { feed | data = Loading }, getItems ids )
 
-        ChainItems (t, items) ->
-            ( { feed | data = items, now = t }, Cmd.none )
+            FetchSingleItem (t, item) ->
+                ( { feed | data = item, now = t }, getKidsOfSeveral item )
 
-        ChainComments (t, parentId, comments) ->
-            ( { feed | data = discuss feed comments, comments = db parentId comments feed, now = t }, getKidsOfSeveral comments )
+            ChainItems (t, items) ->
+                ( { feed | data = items, now = t }, Cmd.none )
 
-        From (Just page) ->
-            ( { feed | page = page, comments = empty }, getPage page )
+            ChainComments (t, parentId, comments) ->
+                ( { feed | data = discuss comments, comments = db parentId comments, now = t }, getKidsOfSeveral comments )
 
-        From Nothing ->
-            feed ! [ Cmd.none ]
+            From (Just page) ->
+                ( { feed | page = page, comments = empty }, getPage page )
+
+            From Nothing ->
+                feed ! [ Cmd.none ]
 
 
 -- +++++++++++
