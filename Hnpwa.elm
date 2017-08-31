@@ -202,7 +202,8 @@ type alias Feed =
         -- top, new, show, ask, jobs, job or comment
     , now :
         Time
-    , comments :
+    , comments : Items 
+    , index :
         Dict Int (List Item) 
     , responses :
         Responses
@@ -211,7 +212,7 @@ type alias Feed =
 
 initialFeed : Feed
 initialFeed =
-    { data = NotAsked, page = Blank, now = 0, comments = empty, responses = Responses [] }
+    { data = NotAsked, page = Blank, now = 0, comments = NotAsked, index = empty, responses = Responses [] }
 
 
 
@@ -235,7 +236,7 @@ page feed =
             if item.kids == Nothing then
                 Nothing
             else
-                Dict.get item.id feed.comments
+                Dict.get item.id feed.index
 
         {-- ***********************************
         I T E M   V I E W 
@@ -249,11 +250,13 @@ page feed =
             if item.type_ == "comment" then
                 case item.parent of
                     Just pid ->
-                        if Dict.member pid feed.comments == True then
+                        -- RISQUE D'ETRE INVISIBLE SI PREMIER ITEM DE LIST SUR UNE PAGE ITEM
+                        if Dict.member pid feed.index == True then
                             nolist
                         else
                             story feed (index, item)
 
+                    -- RISQUE D'ETRE AFFICHÉ DEUX FOIS
                     Nothing ->
                         story feed (index, item)
 
@@ -274,7 +277,6 @@ page feed =
                 , attribute "aria-posinset" <| posInSet index 
                 ])
                 <| pushComment items (index, item)
-                <| msg (index, item)
                 
         knode : List Item -> (Int, Item) -> (String, Html Data)
         knode items (index, item) =
@@ -282,8 +284,8 @@ page feed =
             , htmlContent items (index, item)
             )
 
-        pushComment : List Item -> (Int, Item) -> List (Html Data) -> List (String, Html Data)
-        pushComment items (index, item) parentHtml =
+        pushComment : List Item -> (Int, Item) -> List (String, Html Data)
+        pushComment items (index, item)=
             let
                 c : Comment
                 c =
@@ -295,7 +297,7 @@ page feed =
                     }
 
                 i : Item
-                i = Dict.get item.id feed.comments
+                i = Dict.get item.id feed.index
                     |> withDefault nolist
                     |> drop index
                     |> head
@@ -308,13 +310,11 @@ page feed =
                 content =
                     case feed.page of
                         SingleItem id ->
-                            List.append parentHtml str
+                            str
                                 |> List.indexedMap (,)
                                 |> List.map (Tuple.mapFirst (\_ -> toString c.index))
                         _ -> 
-                            parentHtml
-                                |> List.indexedMap (,)
-                                |> List.map (Tuple.mapFirst (\_ -> toString c.index))
+                            nolist
 
                 nodes : List (String, Html Data)
                 nodes =
@@ -341,10 +341,10 @@ page feed =
         setSize : List Item -> Item -> String 
         setSize li item =
             if item.type_ == "comment" then
-                -- get the size from registered comments by their parent id
+                -- get the size from registered index by their parent id
                 case item.parent of
                     Just pid ->
-                        Dict.get pid feed.comments
+                        Dict.get pid feed.index
                             |> withDefault []
                             |> length
                             |> toString
@@ -360,23 +360,44 @@ page feed =
                     |> toString
 
         indexed : List Item -> List ( Int, Item )
-        indexed li =
-            List.indexedMap (,) li
+        indexed items =
+            List.indexedMap (,) items
 
         -- index starts at zero but aria-posinset starts at one
         -- so we increment by +1 all keys of the index
         posInSet : Int -> String
         posInSet n = n + 1 |> toString
-        
+
         {-- ***********************************
         I T E M   V I E W 
         ***************************************
         --}
-        articles : List Item -> Html Data
-        articles li = 
-            indexed li
-                |> List.map (knode li)
-                |> Lz.lazy (K.node "main" [ attribute "aria-busy" "false", attribute "role" "feed" ])
+        comments : List Item -> List (String, Html Data)
+        comments listed = 
+            let
+                cnodes = 
+                    indexed listed
+                        |> List.map (knode listed)
+            in
+                case feed.comments of
+                    Success c ->
+                        cnodes
+                    Loading ->
+                        [ ("0", text "loading comments") ]
+                    _ ->
+                        nolist
+
+        stories : List Item -> List (String, Html Data) 
+        stories inList = 
+            indexed inList
+                |> List.concatMap (story feed)
+                |> List.indexedMap (,)
+                |> List.map (Tuple.mapFirst (\x -> toString x))
+                
+        appendToStories : List (String, Html Data) -> List (String, Html Data) -> List (String, Html Data)
+        appendToStories comments stories =
+            append stories comments
+
     in
             case feed.data of 
                 Loading ->
@@ -389,7 +410,9 @@ page feed =
 
                 Success items ->
                     List.filter (\i -> i.type_ /= "comment") items
-                        |> articles
+                        |> stories 
+                        |> appendToStories (comments items)
+                        |> Lz.lazy (K.node "main" [ attribute "aria-busy" "false", attribute "role" "feed" ])
 
                 Failure err ->
                     p [ id "err" ]
@@ -705,10 +728,7 @@ type alias Comment =
     , kids: Maybe (List Item) 
     }
 
-type Comments = List Comment
-
-
-
+type Comments = Comments Items
 
 -- REQUESTS
 -- GET Request for top, new, ask and job stories
@@ -911,9 +931,17 @@ item =
 update : Data -> Feed -> ( Feed, Cmd Data )
 update data feed =
     let
-        discuss : Items -> Items 
-        discuss comments =
-            RD.map2 append feed.data comments
+        discuss : Items -> ( Items, Cmd Data )
+        discuss w =
+            let
+                appended = RD.map2 append feed.data w 
+
+                listOf comments = (comments, getKidsOfSeveral w)
+                    
+                updated = RD.update listOf appended
+            in
+                updated
+
         -- RD.andThen RD.succeed
 
         -- index of comments
@@ -922,9 +950,11 @@ update data feed =
         db parentId comments =
             case comments of
                 Success c ->
-                    insert parentId c feed.comments
+                    insert parentId c feed.index 
                 _ ->
-                    feed.comments
+                    feed.index
+
+
     in
         case data of
             FetchStories ids ->
@@ -936,11 +966,14 @@ update data feed =
             ChainItems (t, items) ->
                 ( { feed | data = items, now = t }, Cmd.none )
 
-            ChainComments (t, parentId, comments) ->
-                ( { feed | data = discuss comments, comments = db parentId comments, now = t }, getKidsOfSeveral comments )
+            ChainComments (t, parentId, words) ->
+                let
+                    (i, c) = discuss words 
+                in
+                    ( { feed | comments = i, index = db parentId words, now = t }, c )
 
             From (Just page) ->
-                ( { feed | page = page, comments = empty }, getPage page )
+                ( { feed | page = page, comments = NotAsked, index = empty }, getPage page )
 
             From Nothing ->
                 feed ! [ Cmd.none ]
