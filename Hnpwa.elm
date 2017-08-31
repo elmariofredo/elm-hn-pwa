@@ -225,12 +225,16 @@ page feed =
         {-- ***********************************
         C O M M E N T S   C H E C K
         ***************************************
+        -- has item kids or parent?
         --}
+
+        -- get parent item if there
         parent : Int -> List Item -> Maybe Item
-        parent byId fromList =
-            List.filter (\i -> i.id == byId) fromList 
+        parent withParentId isInList =
+            List.filter (\i -> i.id == withParentId) isInList 
                 |> head
 
+        -- get kids of item if there
         kids : Item -> Maybe (List Item)
         kids item =
             if item.kids == Nothing then
@@ -247,21 +251,17 @@ page feed =
 
         msg : (Int, Item) -> List (Html Data)
         msg (index, item) =
-            if item.type_ == "comment" then
-                case item.parent of
-                    Just pid ->
-                        -- RISQUE D'ETRE INVISIBLE SI PREMIER ITEM DE LIST SUR UNE PAGE ITEM
-                        if Dict.member pid feed.index == True then
-                            nolist
+            let
+                str = story feed (index, item)
+            in
+                case feed.page of
+                    SingleItem id ->
+                        if id == item.id then
+                            str
                         else
-                            story feed (index, item)
-
-                    -- RISQUE D'ETRE AFFICHÉ DEUX FOIS
-                    Nothing ->
-                        story feed (index, item)
-
-            else
-                story feed (index, item)
+                            nolist
+                    _ ->
+                        str
 
         {-- ***********************************
         K E Y E D   N O D E 
@@ -277,6 +277,8 @@ page feed =
                 , attribute "aria-posinset" <| posInSet index 
                 ])
                 <| pushComment items (index, item)
+                -- <| List.concatMap (pushComment items)
+                -- <| indexed items
                 
         knode : List Item -> (Int, Item) -> (String, Html Data)
         knode items (index, item) =
@@ -291,15 +293,35 @@ page feed =
                 c =
                     { parent = parent item.id items
                     , item = i
-                    , index = 0 + index 
+                    , index = indexOf i 
                     , id = i.id
                     , kids = kids i
                     }
 
+                siblings : Maybe (List Item)
+                siblings = Dict.get item.id feed.index 
+
+                indexOf : Item -> Int
+                indexOf item =
+                    let
+                        s = siblings |> withDefault nolist
+                        indexOf_ : List Item -> Int -> Maybe Int
+                        indexOf_ list index =
+                            case list of
+                                [] -> Nothing
+                                i::is ->
+                                    if i == item then
+                                        Just index
+                                    else
+                                        indexOf_ is (index + 1)
+                    in
+                        indexOf_ s 0
+                            |> withDefault 0
+
+
                 i : Item
                 i = Dict.get item.id feed.index
                     |> withDefault nolist
-                    |> drop index
                     |> head
                     |> withDefault item
 
@@ -369,7 +391,7 @@ page feed =
         posInSet n = n + 1 |> toString
 
         {-- ***********************************
-        I T E M   V I E W 
+        C O M M E N T   V I E W 
         ***************************************
         --}
         comments : List Item -> List (String, Html Data)
