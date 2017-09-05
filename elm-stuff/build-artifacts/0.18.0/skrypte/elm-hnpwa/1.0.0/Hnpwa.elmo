@@ -253,53 +253,67 @@ var _skrypte$elm_hnpwa$Hnpwa$story = F2(
 				return _elm_lang$core$Native_Utils.eq(
 					_elm_lang$core$String$isEmpty(h2url),
 					true) ? A2(
-					_elm_lang$html$Html$h2,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(title),
-						_1: {ctor: '[]'}
-					}) : A2(
-					_elm_lang$html$Html$h2,
+					_elm_lang$html$Html$header,
 					{ctor: '[]'},
 					{
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$a,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$target('_blank'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$rel('noopener'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$href(h2url),
-										_1: {ctor: '[]'}
-									}
-								}
-							},
+							_elm_lang$html$Html$h2,
+							{ctor: '[]'},
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(title),
 								_1: {ctor: '[]'}
 							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$span,
-								{
+						_1: {ctor: '[]'}
+					}) : A2(
+					_elm_lang$html$Html$header,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$h2,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$a,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$target('_blank'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$rel('noopener'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$href(h2url),
+												_1: {ctor: '[]'}
+											}
+										}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(title),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('source'),
+									_0: A2(
+										_elm_lang$html$Html$span,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('source'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(domain),
+											_1: {ctor: '[]'}
+										}),
 									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(domain),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}
+								}
+							}),
+						_1: {ctor: '[]'}
 					});
 			}
 		}();
@@ -367,14 +381,7 @@ var _skrypte$elm_hnpwa$Hnpwa$story = F2(
 			});
 		return {
 			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$header,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: heading,
-					_1: {ctor: '[]'}
-				}),
+			_0: heading,
 			_1: {
 				ctor: '::',
 				_0: A2(
@@ -946,10 +953,6 @@ var _skrypte$elm_hnpwa$Hnpwa$Responses = function (a) {
 };
 var _skrypte$elm_hnpwa$Hnpwa$NoComment = {ctor: 'NoComment'};
 var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
-	var appendToStories = F2(
-		function (comments, stories) {
-			return A2(_elm_lang$core$List$append, stories, comments);
-		});
 	var posInSet = function (n) {
 		return _elm_lang$core$Basics$toString(n + 1);
 	};
@@ -961,24 +964,6 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 					return {ctor: '_Tuple2', _0: v0, _1: v1};
 				}),
 			items);
-	};
-	var stories = function (inList) {
-		return A2(
-			_elm_lang$core$List$map,
-			_elm_lang$core$Tuple$mapFirst(
-				function (x) {
-					return _elm_lang$core$Basics$toString(x);
-				}),
-			A2(
-				_elm_lang$core$List$indexedMap,
-				F2(
-					function (v0, v1) {
-						return {ctor: '_Tuple2', _0: v0, _1: v1};
-					}),
-				A2(
-					_elm_lang$core$List$concatMap,
-					_skrypte$elm_hnpwa$Hnpwa$story(feed),
-					indexed(inList))));
 	};
 	var setSize = F2(
 		function (li, item) {
@@ -999,6 +984,74 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 					_elm_lang$core$List$length(li));
 			}
 		});
+	var snode = F2(
+		function (items, _p27) {
+			var _p28 = _p27;
+			var _p30 = _p28._1;
+			var _p29 = _p28._0;
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Basics$toString(_p29),
+				_1: A2(
+					_elm_lang$html$Html_Lazy$lazy,
+					A2(
+						_elm_lang$html$Html_Keyed$node,
+						'article',
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$id(
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_p30.type_,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										'-',
+										_elm_lang$core$Basics$toString(_p30.id)))),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class(_p30.type_),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$tabindex(0),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html_Attributes$attribute,
+											'aria-setsize',
+											A2(setSize, items, _p30)),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html_Attributes$attribute,
+												'aria-posinset',
+												posInSet(_p29)),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}),
+					A2(
+						_elm_lang$core$List$map,
+						_elm_lang$core$Tuple$mapFirst(_elm_lang$core$Basics$toString),
+						A2(
+							_elm_lang$core$List$indexedMap,
+							F2(
+								function (v0, v1) {
+									return {ctor: '_Tuple2', _0: v0, _1: v1};
+								}),
+							A2(
+								_skrypte$elm_hnpwa$Hnpwa$story,
+								feed,
+								{ctor: '_Tuple2', _0: _p29, _1: _p30}))))
+			};
+		});
+	var stories = function (inList) {
+		return A2(
+			_elm_lang$core$List$map,
+			snode(inList),
+			indexed(inList));
+	};
 	var parent = F2(
 		function (withParentId, isInList) {
 			return _elm_lang$core$List$head(
@@ -1010,37 +1063,37 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 					isInList));
 		});
 	var pushComment = F2(
-		function (items, _p27) {
-			var _p28 = _p27;
-			var _p35 = _p28._1;
+		function (items, _p31) {
+			var _p32 = _p31;
+			var _p39 = _p32._1;
 			var siblingOf = function (comment) {
 				var siblingOf_ = F2(
 					function (comment, inList) {
 						siblingOf_:
 						while (true) {
-							var _p29 = inList;
-							if (_p29.ctor === '[]') {
+							var _p33 = inList;
+							if (_p33.ctor === '[]') {
 								return _elm_lang$core$Maybe$Nothing;
 							} else {
-								if (_elm_lang$core$Native_Utils.eq(_p29._0.id, comment.item.id)) {
-									return _elm_lang$core$List$head(_p29._1);
+								if (_elm_lang$core$Native_Utils.eq(_p33._0.id, comment.item.id)) {
+									return _elm_lang$core$List$head(_p33._1);
 								} else {
-									var _v21 = comment,
-										_v22 = A2(_elm_lang$core$List$drop, 1, inList);
-									comment = _v21;
-									inList = _v22;
+									var _v22 = comment,
+										_v23 = A2(_elm_lang$core$List$drop, 1, inList);
+									comment = _v22;
+									inList = _v23;
 									continue siblingOf_;
 								}
 							}
 						}
 					});
 				var inList = function () {
-					var _p30 = comment.parent;
-					if (_p30.ctor === 'Just') {
+					var _p34 = comment.parent;
+					if (_p34.ctor === 'Just') {
 						return A2(
 							_elm_lang$core$Maybe$withDefault,
 							_skrypte$elm_hnpwa$Hnpwa$nolist,
-							A2(_elm_lang$core$Dict$get, _p30._0.id, feed.index));
+							A2(_elm_lang$core$Dict$get, _p34._0.id, feed.index));
 					} else {
 						return _skrypte$elm_hnpwa$Hnpwa$nolist;
 					}
@@ -1050,7 +1103,7 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 					comment.item,
 					A2(siblingOf_, comment, inList));
 				return _elm_lang$core$Native_Utils.eq(sibling, comment.item) ? comment : {
-					parent: A2(parent, _p35.id, items),
+					parent: A2(parent, _p39.id, items),
 					item: sibling,
 					index: comment.index + 1,
 					kids: sibling.kids,
@@ -1060,12 +1113,12 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 				};
 			};
 			var content = function (comment) {
-				var _p31 = feed.page;
-				if (_p31.ctor === 'SingleItem') {
+				var _p35 = feed.page;
+				if (_p35.ctor === 'SingleItem') {
 					return A2(
 						_elm_lang$core$List$map,
 						_elm_lang$core$Tuple$mapFirst(
-							function (_p32) {
+							function (_p36) {
 								return _elm_lang$core$Basics$toString(comment.index);
 							}),
 						A2(
@@ -1085,11 +1138,11 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 			var cascade = function (comment) {
 				var cc = content(comment);
 				var pid = function () {
-					var _p33 = comment.parent;
-					if (_p33.ctor === 'Nothing') {
+					var _p37 = comment.parent;
+					if (_p37.ctor === 'Nothing') {
 						return 0;
 					} else {
-						return _p33._0.id;
+						return _p37._0.id;
 					}
 				}();
 				var childComments = A2(
@@ -1097,8 +1150,8 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 					_skrypte$elm_hnpwa$Hnpwa$nolist,
 					A2(_elm_lang$core$Dict$get, pid, feed.index));
 				var s = siblingOf(comment);
-				var _p34 = comment.kids;
-				if (_p34.ctor === 'Nothing') {
+				var _p38 = comment.kids;
+				if (_p38.ctor === 'Nothing') {
 					return _elm_lang$core$Native_Utils.eq(s.id, comment.id) ? cc : A2(
 						_elm_lang$core$List$append,
 						cc,
@@ -1126,14 +1179,14 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 			};
 			var i = A2(
 				_elm_lang$core$Maybe$withDefault,
-				_p35,
+				_p39,
 				_elm_lang$core$List$head(
 					A2(
 						_elm_lang$core$Maybe$withDefault,
 						_skrypte$elm_hnpwa$Hnpwa$nolist,
-						A2(_elm_lang$core$Dict$get, _p35.id, feed.index))));
+						A2(_elm_lang$core$Dict$get, _p39.id, feed.index))));
 			var c = {
-				parent: A2(parent, _p35.id, items),
+				parent: A2(parent, _p39.id, items),
 				item: i,
 				index: 0,
 				responses: _skrypte$elm_hnpwa$Hnpwa$NoComment,
@@ -1143,23 +1196,36 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 			return cascade(c);
 		});
 	var knode = F2(
-		function (items, _p36) {
-			var _p37 = _p36;
-			var _p38 = _p37._0;
+		function (items, _p40) {
+			var _p41 = _p40;
+			var _p42 = _p41._0;
 			return {
 				ctor: '_Tuple2',
-				_0: _elm_lang$core$Basics$toString(_p38),
+				_0: _elm_lang$core$Basics$toString(_p42),
 				_1: A2(
 					htmlContent,
 					items,
-					{ctor: '_Tuple2', _0: _p38, _1: _p37._1})
+					{ctor: '_Tuple2', _0: _p42, _1: _p41._1})
 			};
 		});
 	var htmlContent = F2(
-		function (items, _p39) {
-			var _p40 = _p39;
-			var _p42 = _p40._1;
-			var _p41 = _p40._0;
+		function (items, _p43) {
+			var _p44 = _p43;
+			var _p46 = _p44._1;
+			var _p45 = _p44._0;
+			var mainContent = (!_elm_lang$core$Native_Utils.eq(_p46.type_, 'comment')) ? A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Tuple$mapFirst(_elm_lang$core$Basics$toString),
+				A2(
+					_elm_lang$core$List$indexedMap,
+					F2(
+						function (v0, v1) {
+							return {ctor: '_Tuple2', _0: v0, _1: v1};
+						}),
+					A2(
+						_skrypte$elm_hnpwa$Hnpwa$story,
+						feed,
+						{ctor: '_Tuple2', _0: _p45, _1: _p46}))) : _skrypte$elm_hnpwa$Hnpwa$nolist;
 			return A2(
 				_elm_lang$html$Html_Lazy$lazy,
 				A2(
@@ -1170,14 +1236,14 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 						_0: _elm_lang$html$Html_Attributes$id(
 							A2(
 								_elm_lang$core$Basics_ops['++'],
-								_p42.type_,
+								_p46.type_,
 								A2(
 									_elm_lang$core$Basics_ops['++'],
 									'-',
-									_elm_lang$core$Basics$toString(_p42.id)))),
+									_elm_lang$core$Basics$toString(_p46.id)))),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class(_p42.type_),
+							_0: _elm_lang$html$Html_Attributes$class(_p46.type_),
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Attributes$tabindex(0),
@@ -1186,13 +1252,13 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 									_0: A2(
 										_elm_lang$html$Html_Attributes$attribute,
 										'aria-setsize',
-										A2(setSize, items, _p42)),
+										A2(setSize, items, _p46)),
 									_1: {
 										ctor: '::',
 										_0: A2(
 											_elm_lang$html$Html_Attributes$attribute,
 											'aria-posinset',
-											posInSet(_p41)),
+											posInSet(_p45)),
 										_1: {ctor: '[]'}
 									}
 								}
@@ -1200,19 +1266,21 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 						}
 					}),
 				A2(
-					pushComment,
-					items,
-					{ctor: '_Tuple2', _0: _p41, _1: _p42}));
+					_elm_lang$core$List$append,
+					mainContent,
+					A2(
+						pushComment,
+						items,
+						{ctor: '_Tuple2', _0: _p45, _1: _p46})));
 		});
 	var comments = function (listed) {
-		var cnodes = A2(
-			_elm_lang$core$List$map,
-			knode(listed),
-			indexed(listed));
-		var _p43 = feed.comments;
-		switch (_p43.ctor) {
+		var _p47 = feed.comments;
+		switch (_p47.ctor) {
 			case 'Success':
-				return cnodes;
+				return A2(
+					_elm_lang$core$List$map,
+					knode(listed),
+					indexed(listed));
 			case 'Loading':
 				return {
 					ctor: '::',
@@ -1227,8 +1295,8 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 				return _skrypte$elm_hnpwa$Hnpwa$nolist;
 		}
 	};
-	var _p44 = feed.data;
-	switch (_p44.ctor) {
+	var _p48 = feed.data;
+	switch (_p48.ctor) {
 		case 'Loading':
 			return A2(
 				_elm_lang$html$Html$main_,
@@ -1273,9 +1341,9 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 					_1: {ctor: '[]'}
 				});
 		case 'Success':
-			var _p46 = _p44._0;
-			var _p45 = feed.page;
-			if (_p45.ctor === 'SingleItem') {
+			var _p50 = _p48._0;
+			var _p49 = feed.page;
+			if (_p49.ctor === 'SingleItem') {
 				return A2(
 					_elm_lang$html$Html_Lazy$lazy,
 					A2(
@@ -1290,10 +1358,7 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 								_1: {ctor: '[]'}
 							}
 						}),
-					A2(
-						appendToStories,
-						comments(_p46),
-						stories(_p46)));
+					comments(_p50));
 			} else {
 				return A2(
 					_elm_lang$html$Html_Lazy$lazy,
@@ -1309,16 +1374,13 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 								_1: {ctor: '[]'}
 							}
 						}),
-					A2(
-						appendToStories,
-						comments(_p46),
-						stories(
-							A2(
-								_elm_lang$core$List$filter,
-								function (i) {
-									return !_elm_lang$core$Native_Utils.eq(i.type_, 'comment');
-								},
-								_p46))));
+					stories(
+						A2(
+							_elm_lang$core$List$filter,
+							function (i) {
+								return !_elm_lang$core$Native_Utils.eq(i.type_, 'comment');
+							},
+							_p50)));
 			}
 		case 'Failure':
 			return A2(
@@ -1357,7 +1419,7 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 								{
 									ctor: '::',
 									_0: _elm_lang$html$Html$text(
-										_elm_lang$core$Basics$toString(_p44._0)),
+										_elm_lang$core$Basics$toString(_p48._0)),
 									_1: {ctor: '[]'}
 								}),
 							_1: {ctor: '[]'}
@@ -1374,11 +1436,19 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 						_elm_lang$html$Html$img,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$src('/svg/hnpwa.svg'),
+							_0: _elm_lang$html$Html_Attributes$width(160),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$alt('HN PWA logo'),
-								_1: {ctor: '[]'}
+								_0: _elm_lang$html$Html_Attributes$height(68),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$src('/svg/hnpwa.svg'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$alt('HN PWA logo'),
+										_1: {ctor: '[]'}
+									}
+								}
 							}
 						},
 						{ctor: '[]'}),
@@ -1393,7 +1463,7 @@ var _skrypte$elm_hnpwa$Hnpwa$main = A2(
 		init: _skrypte$elm_hnpwa$Hnpwa$init,
 		update: _skrypte$elm_hnpwa$Hnpwa$update,
 		view: _skrypte$elm_hnpwa$Hnpwa$page,
-		subscriptions: function (_p47) {
+		subscriptions: function (_p51) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();

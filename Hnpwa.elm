@@ -19,7 +19,7 @@ import List exposing (take, drop, singleton, indexedMap, length, append, head, u
 import Dict exposing (Dict, empty, insert)
 import Array as A
 import Html exposing (Html, Attribute, node, article, main_, nav, section, header, footer, a, br, div, figure, h1, h2, h3, h4, img, li, object, p, span, text, time, ul)
-import Html.Attributes exposing (id, class, href, target, rel, datetime, src, alt, attribute, tabindex, title, type_)
+import Html.Attributes exposing (id, class, href, target, rel, datetime, src, alt, attribute, tabindex, title, type_, width, height)
 import Html.Keyed as K
 import Html.Lazy as Lz
 import HtmlParser exposing (parse)
@@ -245,22 +245,49 @@ page feed =
         -- html content of the keyed node
         htmlContent : List Item -> (Int, Item) -> Html Data
         htmlContent items (index, item) =
-            Lz.lazy (K.node "article"
-                [ id <| item.type_ ++ "-" ++ toString item.id
-                , class item.type_
-                , tabindex 0
-                , attribute "aria-setsize" <| setSize items item
-                , attribute "aria-posinset" <| posInSet index 
-                ])
-                <| pushComment items (index, item)
-                --<| List.concatMap (pushComment items)
-                --<| indexed items
+            let
+                -- story, job or ask content on single item page
+                -- before displaying comments
+                mainContent : List (String, Html Data)
+                mainContent =
+                    if item.type_ /= "comment" then
+                        story feed (index, item)
+                            |> indexedMap (,)
+                            |> List.map (Tuple.mapFirst toString)
+                    else
+                        nolist
+            in
+                Lz.lazy (K.node "article"
+                    [ id <| item.type_ ++ "-" ++ toString item.id
+                    , class item.type_
+                    , tabindex 0
+                    , attribute "aria-setsize" <| setSize items item
+                    , attribute "aria-posinset" <| posInSet index 
+                    ])
+                    <| append mainContent 
+                    <| pushComment items (index, item)
                 
         -- keyed node itself
         knode : List Item -> (Int, Item) -> (String, Html Data)
         knode items (index, item) =
             ( toString index
             , htmlContent items (index, item)
+            )
+
+        snode : List Item -> (Int, Item) -> (String, Html Data)
+        snode items (index, item) =
+            ( toString index
+            , story feed (index, item)
+                |> List.indexedMap (,)
+                |> List.map (Tuple.mapFirst toString)
+                |> Lz.lazy (K.node "article"
+                    [ id <| item.type_ ++ "-" ++ toString item.id
+                    , class item.type_
+                    , tabindex 0
+                    , attribute "aria-setsize" <| setSize items item
+                    , attribute "aria-posinset" <| posInSet index 
+                    ]
+                )
             )
 
         {-- ***********************************
@@ -451,30 +478,19 @@ page feed =
         --}
         comments : List Item -> List (String, Html Data)
         comments listed = 
-            let
-                cnodes = 
+            case feed.comments of
+                Success c ->
                     indexed listed
                         |> List.map (knode listed)
-            in
-                case feed.comments of
-                    Success c ->
-                        cnodes
-                    Loading ->
-                        [ ("0", text "loading comments") ]
-                    _ ->
-                        nolist
+                Loading ->
+                    [ ("0", text "loading comments") ]
+                _ ->
+                    nolist
 
         stories : List Item -> List (String, Html Data) 
         stories inList = 
             indexed inList
-                |> List.concatMap (story feed)
-                |> List.indexedMap (,)
-                |> List.map (Tuple.mapFirst (\x -> toString x))
-                
-        appendToStories : List (String, Html Data) -> List (String, Html Data) -> List (String, Html Data)
-        appendToStories comments stories =
-            append stories comments
-
+                |> List.map (snode inList)
     in
             case feed.data of 
                 Loading ->
@@ -489,13 +505,11 @@ page feed =
                     case feed.page of
                         SingleItem id ->
                             items
-                                |> stories 
-                                |> appendToStories (comments items)
+                                |> comments
                                 |> Lz.lazy (K.node "main" [ attribute "aria-busy" "false", attribute "role" "feed" ])
                         _ ->
                             List.filter (\i -> i.type_ /= "comment") items
                                 |> stories 
-                                |> appendToStories (comments items)
                                 |> Lz.lazy (K.node "main" [ attribute "aria-busy" "false", attribute "role" "feed" ])
 
                 Failure err ->
@@ -513,7 +527,7 @@ page feed =
                 NotAsked ->
                     figure []
                         [
-                            img [ src "/svg/hnpwa.svg" , alt "HN PWA logo" ] []
+                            img [ width 160, height 68, src "/svg/hnpwa.svg" , alt "HN PWA logo" ] []
                         ]
 
 
@@ -674,15 +688,21 @@ story feed (posinset, item) =
                     nohtml
                 False ->
                     if isEmpty h2url == True then
-                        h2 []
-                            [ text title ]
+                        header []
+                            [
+                            h2 []
+                                [ text title ]
+                            ]
                     else
-                        h2 []
-                            [ a [ target "_blank", rel "noopener", href h2url ]
-                                [ text title
-                                ]
-                            , span [ class "source" ]
-                                [ text domain
+                        header []
+                            [
+                            h2 []
+                                [ a [ target "_blank", rel "noopener", href h2url ]
+                                    [ text title
+                                    ]
+                                , span [ class "source" ]
+                                    [ text domain
+                                    ]
                                 ]
                             ]
 
@@ -730,10 +750,7 @@ story feed (posinset, item) =
             -- ARIA accessibility
             -- https://w3c.github.io/aria/aria/aria.html#feed
             -- https://w3c.github.io/aria/aria/aria.html#aria-setsize
-                
-                [ header []
-                    [ heading 
-                    ]
+                [ heading
                 , p [ class "metadata" ]
                     [ text <| "by " ++ item.by
                     , time [ datetime dt ] [ text pubdate ]
