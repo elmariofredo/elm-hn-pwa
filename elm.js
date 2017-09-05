@@ -23449,14 +23449,11 @@ var _skrypte$elm_hnpwa$Hnpwa$getItems = function (ids) {
 				_skrypte$elm_hnpwa$Hnpwa$laz(_skrypte$elm_hnpwa$Hnpwa$item));
 		};
 		return _skrypte$elm_hnpwa$Hnpwa$enlist(
-			A2(
-				_elm_lang$core$Task$andThen,
-				_elm_lang$core$Task$sequence,
-				_elm_lang$core$Task$succeed(
-					A2(
-						_elm_lang$core$List$map,
-						getitem,
-						A2(_elm_lang$core$List$take, _skrypte$elm_hnpwa$Hnpwa$maxItemsPerPage, _p17._0)))));
+			_elm_lang$core$Task$sequence(
+				A2(
+					_elm_lang$core$List$map,
+					getitem,
+					A2(_elm_lang$core$List$take, _skrypte$elm_hnpwa$Hnpwa$maxItemsPerPage, _p17._0))));
 	} else {
 		return _elm_lang$core$Platform_Cmd$none;
 	}

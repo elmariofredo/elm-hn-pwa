@@ -909,15 +909,16 @@ getSingleItem id =
 getItems : RemoteData Http.Error (List Int) -> Cmd Data
 getItems ids =
     case ids of
-        Success items ->
+        Success itemIds ->
             let
                 getitem id =
                     getTask (itemurl id) (laz item)
             in
-                List.take maxItemsPerPage items
+                List.take maxItemsPerPage itemIds
                     |> List.map getitem
-                    |> Task.succeed
-                    |> Task.andThen Task.sequence
+                    --|> Task.succeed
+                    --|> Task.andThen Task.sequence
+                    |> Task.sequence
                     |> enlist
 
         _ ->
