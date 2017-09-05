@@ -1,7 +1,7 @@
 {
   "name": "Elm HN PWA",
   "short_name": "HNPWA",
-  "start_url": "/manifest.json",
+  "start_url": ".",
   "display": "standalone",
   "lang": "en-US",
   "icons": [{
