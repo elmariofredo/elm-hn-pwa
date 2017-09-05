@@ -23200,6 +23200,19 @@ var _skrypte$elm_hnpwa$Hnpwa$itemurl = function (id) {
 					_elm_lang$core$Basics$toString(id),
 					'.json'))));
 };
+var _skrypte$elm_hnpwa$Hnpwa$requestConf = {
+	headers: {
+		ctor: '::',
+		_0: A2(_elm_lang$http$Http$header, 'Origin', _skrypte$elm_hnpwa$Hnpwa$uri),
+		_1: {
+			ctor: '::',
+			_0: A2(_elm_lang$http$Http$header, 'Accept', 'application/json'),
+			_1: {ctor: '[]'}
+		}
+	},
+	withCredentials: false,
+	timeout: _elm_lang$core$Maybe$Just(3 * _elm_lang$core$Time$second)
+};
 var _skrypte$elm_hnpwa$Hnpwa$Feed = F5(
 	function (a, b, c, d, e) {
 		return {data: a, page: b, now: c, comments: d, index: e};
@@ -23362,8 +23375,9 @@ var _skrypte$elm_hnpwa$Hnpwa$getKidsOfSingle = function (i) {
 		return _krisajenkins$remotedata$RemoteData$toMaybe(listComments);
 	};
 	var getItem = function (id) {
-		return A2(
-			_ohanhi$remotedata_http$RemoteData_Http$getTask,
+		return A3(
+			_ohanhi$remotedata_http$RemoteData_Http$getTaskWithConfig,
+			_skrypte$elm_hnpwa$Hnpwa$requestConf,
 			_skrypte$elm_hnpwa$Hnpwa$itemurl(id),
 			_skrypte$elm_hnpwa$Hnpwa$laz(_skrypte$elm_hnpwa$Hnpwa$item));
 	};
@@ -23443,8 +23457,9 @@ var _skrypte$elm_hnpwa$Hnpwa$getItems = function (ids) {
 	var _p17 = ids;
 	if (_p17.ctor === 'Success') {
 		var getitem = function (id) {
-			return A2(
-				_ohanhi$remotedata_http$RemoteData_Http$getTask,
+			return A3(
+				_ohanhi$remotedata_http$RemoteData_Http$getTaskWithConfig,
+				_skrypte$elm_hnpwa$Hnpwa$requestConf,
 				_skrypte$elm_hnpwa$Hnpwa$itemurl(id),
 				_skrypte$elm_hnpwa$Hnpwa$laz(_skrypte$elm_hnpwa$Hnpwa$item));
 		};
@@ -23463,8 +23478,9 @@ var _skrypte$elm_hnpwa$Hnpwa$FetchSingleItem = function (a) {
 };
 var _skrypte$elm_hnpwa$Hnpwa$getSingleItem = function (id) {
 	var t = _skrypte$elm_hnpwa$Hnpwa$timeNow;
-	var i = A2(
-		_ohanhi$remotedata_http$RemoteData_Http$getTask,
+	var i = A3(
+		_ohanhi$remotedata_http$RemoteData_Http$getTaskWithConfig,
+		_skrypte$elm_hnpwa$Hnpwa$requestConf,
 		_skrypte$elm_hnpwa$Hnpwa$itemurl(id),
 		_skrypte$elm_hnpwa$Hnpwa$item);
 	var chained = A3(
@@ -23486,7 +23502,7 @@ var _skrypte$elm_hnpwa$Hnpwa$FetchStories = function (a) {
 var _skrypte$elm_hnpwa$Hnpwa$loadpage = function (page) {
 	var decoder = _elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$int);
 	var endpoint = _skrypte$elm_hnpwa$Hnpwa$url(page);
-	var stories = A2(_ohanhi$remotedata_http$RemoteData_Http$getTask, endpoint, decoder);
+	var stories = A3(_ohanhi$remotedata_http$RemoteData_Http$getTaskWithConfig, _skrypte$elm_hnpwa$Hnpwa$requestConf, endpoint, decoder);
 	var data = _skrypte$elm_hnpwa$Hnpwa$FetchStories;
 	return A2(_elm_lang$core$Task$perform, data, stories);
 };

@@ -24,14 +24,15 @@ import Html.Keyed as K
 import Html.Lazy as Lz
 import HtmlParser exposing (parse)
 import HtmlParser.Util exposing (toVirtualDom)
-import Http
+import Http exposing (Header) 
 import Task exposing (Task)
 import Maybe exposing (withDefault)
+import Result as R
 import RemoteData as RD exposing (RemoteData(..), WebData)
-import RemoteData.Http exposing (get, getTask)
+import RemoteData.Http exposing (get, Config, getTaskWithConfig)
 import Navigation exposing (Location)
 import UrlParser as Url exposing (Parser, oneOf, s, parseHash, (</>))
-import Time exposing (Time, inSeconds, inMinutes, inHours, inMilliseconds)
+import Time exposing (Time, inSeconds, inMinutes, inHours, inMilliseconds, second)
 import Date exposing (Date, fromTime, day, month, year)
 import Time.DateTime exposing (fromTimestamp, toISO8601)
 
@@ -878,7 +879,7 @@ loadpage page =
             list int
 
         stories =
-            getTask endpoint decoder
+            getTaskWithConfig requestConf endpoint decoder
     in
         Task.perform data stories
 
@@ -887,13 +888,22 @@ loadpage page =
 -- get a single item by its id
 --getSingleItem : Int -> Cmd Data
 
+requestConf : Config
+requestConf =
+    { headers =
+        [ Http.header "Origin" uri 
+        , Http.header "Accept" "application/json"
+        ]
+    , withCredentials = False
+    , timeout = Just <| 3 * second  
+    }
 
 getSingleItem : Int -> Cmd Data
 getSingleItem id =
     let
         i : Task Never (WebData Item)
         i =
-            getTask (itemurl id) item
+            getTaskWithConfig requestConf (itemurl id) item
 
         t = timeNow
 
@@ -912,7 +922,7 @@ getItems ids =
         Success itemIds ->
             let
                 getitem id =
-                    getTask (itemurl id) (laz item)
+                    getTaskWithConfig requestConf (itemurl id) (laz item)
             in
                 List.take maxItemsPerPage itemIds
                     |> List.map getitem
@@ -971,7 +981,7 @@ getKidsOfSingle i =
                 Nothing ->
                     []
 
-        getItem id = getTask (itemurl id) (laz item)
+        getItem id = getTaskWithConfig requestConf (itemurl id) (laz item)
 
         maybeSuccess listComments =
             RD.toMaybe listComments
