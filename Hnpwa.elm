@@ -15,7 +15,7 @@ module Hnpwa exposing (..)
 import Json.Decode as JD exposing (Decoder, int, string, list, lazy)
 import Json.Decode.Pipeline exposing (optional, required, decode)
 import String exposing (isEmpty, split, concat, join)
-import List exposing (take, drop, singleton, indexedMap, length, append, head, unzip)
+import List exposing (take, drop, singleton, indexedMap, length, append, head, unzip, partition)
 import Dict exposing (Dict, empty, insert)
 import Array as A
 import Html exposing (Html, Attribute, node, article, main_, nav, section, header, footer, a, br, div, figure, h1, h2, h3, h4, img, li, object, p, span, text, time, ul)
@@ -114,9 +114,10 @@ nolist = List.map never []
 nohtml = Html.map never <| text ""
 
 
--- +++++++++
--- PAGE
--- +++++++++
+{-- ***********************************
+ M O D E L   O F   P A G E
+***************************************
+--}
 
 
 type Page
@@ -205,25 +206,27 @@ type alias Feed =
     , comments : Items 
     , index :
         Dict Int (List Item) 
-    , responses :
-        Responses
     }
 
 
 initialFeed : Feed
 initialFeed =
-    { data = NotAsked, page = Blank, now = 0, comments = NotAsked, index = empty, responses = Responses [] }
+    { data = NotAsked, page = Blank, now = 0, comments = NotAsked, index = empty }
 
 
 
 -- root page view
 
 
+{-- ***********************************
+ V I E W S
+***************************************
+--}
 page : Feed -> Html Data
 page feed =
     let
         {-- ***********************************
-        C O M M E N T S   C H E C K
+        P A R E N T  I T E M   C H E C K
         ***************************************
         -- has item kids or parent?
         --}
@@ -234,39 +237,12 @@ page feed =
             List.filter (\i -> i.id == withParentId) isInList 
                 |> head
 
-        -- get kids of item if there
-        kids : Item -> Maybe (List Item)
-        kids item =
-            if item.kids == Nothing then
-                Nothing
-            else
-                Dict.get item.id feed.index
-
-        {-- ***********************************
-        I T E M   V I E W 
-        ***************************************
-        -- works for story, job and comment
-        -- with recursive call to comments
-        --}
-
-        msg : (Int, Item) -> List (Html Data)
-        msg (index, item) =
-            let
-                str = story feed (index, item)
-            in
-                case feed.page of
-                    SingleItem id ->
-                        if id == item.id then
-                            str
-                        else
-                            nolist
-                    _ ->
-                        str
-
         {-- ***********************************
         K E Y E D   N O D E 
         ***************************************
         --}
+
+        -- html content of the keyed node
         htmlContent : List Item -> (Int, Item) -> Html Data
         htmlContent items (index, item) =
             Lz.lazy (K.node "article"
@@ -277,15 +253,21 @@ page feed =
                 , attribute "aria-posinset" <| posInSet index 
                 ])
                 <| pushComment items (index, item)
-                -- <| List.concatMap (pushComment items)
-                -- <| indexed items
+                --<| List.concatMap (pushComment items)
+                --<| indexed items
                 
+        -- keyed node itself
         knode : List Item -> (Int, Item) -> (String, Html Data)
         knode items (index, item) =
             ( toString index
             , htmlContent items (index, item)
             )
 
+        {-- ***********************************
+        C O M M E N T S
+        ***************************************
+        -- push first comment child after the current item which can be a comment itself
+        --}
         pushComment : List Item -> (Int, Item) -> List (String, Html Data)
         pushComment items (index, item)=
             let
@@ -293,31 +275,11 @@ page feed =
                 c =
                     { parent = parent item.id items
                     , item = i
-                    , index = indexOf i 
+                    , index = 0 
+                    , responses = NoComment 
                     , id = i.id
-                    , kids = kids i
+                    , kids = i.kids 
                     }
-
-                siblings : Maybe (List Item)
-                siblings = Dict.get item.id feed.index 
-
-                indexOf : Item -> Int
-                indexOf item =
-                    let
-                        s = siblings |> withDefault nolist
-                        indexOf_ : List Item -> Int -> Maybe Int
-                        indexOf_ list index =
-                            case list of
-                                [] -> Nothing
-                                i::is ->
-                                    if i == item then
-                                        Just index
-                                    else
-                                        indexOf_ is (index + 1)
-                    in
-                        indexOf_ s 0
-                            |> withDefault 0
-
 
                 i : Item
                 i = Dict.get item.id feed.index
@@ -325,34 +287,127 @@ page feed =
                     |> head
                     |> withDefault item
 
-                str : List (Html Data)
-                str = story feed (c.index, c.item)
-
-                content : List (String, Html Data)
-                content =
+                {-- ***********************************
+                D I S P L A Y   H T M L
+                ***************************************
+                -- html content of comment
+                -- ready to be added to the keyed node
+                --}
+                content : Comment -> List (String, Html Data)
+                content comment =
                     case feed.page of
+                        -- if page is an item page
+                        -- display html 
+                        -- and make it ready to be added to the keyed node
                         SingleItem id ->
-                            str
+                            story feed (comment.index, comment.item)
                                 |> List.indexedMap (,)
-                                |> List.map (Tuple.mapFirst (\_ -> toString c.index))
+                                |> List.map (Tuple.mapFirst (\_ -> toString comment.index))
+                        -- if not, no comments
                         _ -> 
                             nolist
 
-                nodes : List (String, Html Data)
-                nodes =
-                    case c.kids of
-                        Nothing ->
-                            content
-                        Just kids ->
-                            A.fromList content
-                                |> A.push (knode kids (c.index, c.item)) 
-                                |> A.toList
+                {-- ***********************************
+                S I B L I N G   C O M M E N T
+                ***************************************
+                --}
+                siblingOf : Comment -> Comment
+                siblingOf comment =
+                    let
+                        inList : List Item
+                        inList =
+                            case comment.parent of
+                                Just item ->
+                                    Dict.get item.id feed.index
+                                        |> withDefault nolist
+                                -- not a comment
+                                -- impossible state, really
+                                Nothing ->
+                                    nolist
+
+                        siblingOf_ : Comment -> List Item -> Maybe Item
+                        siblingOf_ comment inList  =
+                            case inList of
+                                [] ->
+                                    Nothing
+                                i::is ->
+                                    if i.id == comment.item.id then
+                                        head is
+                                    else
+                                        drop 1 inList
+                                        |> siblingOf_ comment 
+
+                        sibling = siblingOf_ comment inList
+                            |> withDefault comment.item
+                    in
+                        if sibling == comment.item then
+                            comment
+                        else
+                            { 
+                            parent = parent item.id items 
+                            , item = sibling
+                            , index = comment.index + 1 
+                            , kids = sibling.kids 
+                            , id = sibling.id
+                            , responses = Responses []
+                            }
+
+                {-- ************************************
+                C O M M E N T S   C O M B I N A T I O N 
+                ****************************************
+                --}
+                cascade : Comment -> List (String, Html Data)
+                cascade comment =
+                    let
+                        s = siblingOf comment
+
+                        pid : Int
+                        pid =
+                            case comment.parent of
+                                Nothing ->
+                                    0
+                                Just item ->
+                                    item.id
+
+                        cc = content comment
+
+                        -- list of sibling comments
+                        -- the list contains the current comment too
+                        childComments : List Item
+                        childComments =
+                                Dict.get pid feed.index
+                                    |> withDefault nolist
+                    in
+                        case comment.kids of
+                            Nothing ->
+                                if s.id == comment.id then
+                                    -- nok kid neither sibling comment
+                                    cc
+                                else
+                                    -- no kids but sibling comment
+                                    append cc
+                                        <| cascade s
+                            Just kids ->
+                                -- push child comments
+                                if childComments == nolist then
+                                    cc
+                                else 
+                                    if s.id == comment.id then
+                                        cc
+                                            |> A.fromList
+                                            |> A.push (knode childComments (comment.index, comment.item)) 
+                                            |> A.toList
+                                    else
+                                        append 
+                                            ( cc
+                                            |> A.fromList
+                                            |> A.push (knode childComments (comment.index, comment.item)) 
+                                            |> A.toList
+                                            )
+                                            <| cascade s
+
             in
-                nodes
-
-
-
-
+                cascade c
 
         {-- ***********************************
         A R I A
@@ -431,10 +486,17 @@ page feed =
                         ]
 
                 Success items ->
-                    List.filter (\i -> i.type_ /= "comment") items
-                        |> stories 
-                        |> appendToStories (comments items)
-                        |> Lz.lazy (K.node "main" [ attribute "aria-busy" "false", attribute "role" "feed" ])
+                    case feed.page of
+                        SingleItem id ->
+                            items
+                                |> stories 
+                                |> appendToStories (comments items)
+                                |> Lz.lazy (K.node "main" [ attribute "aria-busy" "false", attribute "role" "feed" ])
+                        _ ->
+                            List.filter (\i -> i.type_ /= "comment") items
+                                |> stories 
+                                |> appendToStories (comments items)
+                                |> Lz.lazy (K.node "main" [ attribute "aria-busy" "false", attribute "role" "feed" ])
 
                 Failure err ->
                     p [ id "err" ]
@@ -684,9 +746,10 @@ story feed (posinset, item) =
 
 
 
--- +++++++++
--- DATA
--- +++++++++
+{-- ***********************************
+ D A T A
+***************************************
+--}
 -- stories are lists of items
 -- in a form of a JSON array of integers
 -- after parsing list of ids
@@ -731,29 +794,34 @@ type alias Item =
 
 
 
--- +++++++++
--- COMMENTS
--- +++++++++
+{-- ***********************************
+ C O M M E N T S
+***************************************
 -- howto update value in a recursive type
 -- https://github.com/elm-lang/elm-compiler/blob/master/hints/recursive-alias.md
 -- https://stackoverflow.com/questions/39883252/update-value-in-a-recursive-type-elm-lang
-
-
-type Responses = Responses (List Feed)
+--}
 
 
 type alias Comment =
     { parent: Maybe Item
     , item : Item
     , index : Int
+    , responses : Responses 
     , id : Int
-    , kids: Maybe (List Item) 
+    , kids: Maybe (List Int) 
     }
 
-type Comments = Comments Items
+type Responses = 
+    NoComment
+    | Responses (List Comment)
 
--- REQUESTS
+
+{-- ***********************************
+ R E Q UE S T S
+***************************************
 -- GET Request for top, new, ask and job stories
+--}
 
 
 getPage : Page -> Cmd Data
@@ -923,9 +991,11 @@ getKidsOfSingle i =
 
 
 
--- DECODERS
--- +++++++++
+{-- ***********************************
+ D E C O D E R S
+***************************************
 -- returns Result Ok values of item
+--}
 
 
 item : Decoder Item
@@ -945,9 +1015,10 @@ item =
 
 
 
--- +++++++++
--- UPDATE
--- +++++++++
+{-- ***********************************
+ U P D A T E
+***************************************
+--}
 
 
 update : Data -> Feed -> ( Feed, Cmd Data )
@@ -1001,10 +1072,11 @@ update data feed =
                 feed ! [ Cmd.none ]
 
 
--- +++++++++++
--- NAVIGATION
--- +++++++++++
+{-- ***********************************
+ N A VI G A T I O N
+***************************************
 -- url in the browser
+--}
 
 
 route : Parser (Page -> a) a
@@ -1073,9 +1145,10 @@ pathparser loc =
 
 
 
--- +++++++++
--- INIT
--- +++++++++
+{-- ***********************************
+ I N I T 
+***************************************
+--}
 
 
 init : Location -> ( Feed, Cmd Data )
@@ -1107,9 +1180,10 @@ init loc =
 
 
 
--- +++++++++++++
--- MAIN PROGRAM
--- +++++++++++++
+{-- ***********************************
+ M A I N   P R O G R A M
+***************************************
+--}
 
 
 main : Program Never Feed Data
