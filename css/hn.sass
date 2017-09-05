@@ -344,13 +344,17 @@ time
     padding-left: 5px
 
 #loading
-  display: flex
-  justify-content: center
-  align-items: center
+  height: 100%
+  width: 100vw
+  cursor: wait
 
   > object
     width: 100px
     height: 100px
+    position: absolute
+    top: calc(50vh - 100px) 
+    left: calc(50vw - 100px) 
+    overflow: visible
 
 #err
   font-size: large
@@ -385,3 +389,6 @@ h4
 
 .comment:nth-of-type(even)
   border-left-color: $lightteal 
+
+.main
+  margin-left: 10px
