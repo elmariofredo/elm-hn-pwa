@@ -18,8 +18,11 @@ import String exposing (isEmpty, split, concat, join)
 import List exposing (take, drop, singleton, indexedMap, length, append, head, unzip, partition)
 import Dict exposing (Dict, empty, insert)
 import Array as A
-import Html exposing (Html, Attribute, node, article, main_, nav, section, header, footer, a, br, div, figure, h1, h2, h3, h4, img, li, object, p, span, text, time, ul)
-import Html.Attributes exposing (id, class, href, target, rel, datetime, src, alt, attribute, tabindex, title, type_, width, height)
+import Process exposing (sleep)
+import Svg as G exposing (rect, path, desc, svg, g, animate, circle)
+import Svg.Attributes exposing (d, fill, x, y, width, height, viewBox, cx, cy, r, attributeName, begin, dur, values, calcMode, keyTimes, keySplines, repeatCount, stroke, strokeWidth)
+import Html exposing (Html, Attribute, node, article, main_, nav, section, header, footer, a, br, div, figure, h1, h2, h3, h4, li, object, p, span, text, time, ul)
+import Html.Attributes exposing (id, class, href, target, rel, datetime, src, alt, attribute, tabindex, title, type_)
 import Html.Keyed as K
 import Html.Lazy as Lz
 import HtmlParser exposing (parse)
@@ -498,8 +501,79 @@ page feed =
                     main_ [ attribute "aria-busy" "true", attribute "role" "feed" ]
                         [
                             div [ id "loading" ] [
-                                object [ attribute "data" "/svg/puff.svg", type_ "image/svg+xml" ] [ text "Loading..." ]
-                                ]
+                                svg
+                                    [ attribute "role" "img"
+                                    , attribute "labelledby" "loader"
+                                    , stroke "#18583f"
+                                    , viewBox "0 0 44 44"
+                                    ]
+                                    [ G.title
+                                        [ id "loader" ]
+                                        [ G.text "loading"]
+                                    , desc
+                                        []
+                                        [ G.text "Loading the page, please wait..." ]
+                                    , g [ strokeWidth "2" ]
+                                        [
+                                        circle
+                                            [ cx "22"
+                                            , cy "22"
+                                            , r "1"
+                                            ]
+                                            [ animate
+                                                [ attributeName "r"
+                                                , begin "0s"
+                                                , dur "1.8s"
+                                                , values "1; 20"
+                                                , calcMode "spline"
+                                                , keyTimes "0; 1"
+                                                , keySplines "0.165, 0.84, 0.44, 1"
+                                                , repeatCount "indefinite"
+                                                ]
+                                                []
+                                            , animate
+                                                [ attributeName "stroke-opacity"
+                                                , begin "0s"
+                                                , dur "1.8s"
+                                                , values "1; 0"
+                                                , calcMode "spline"
+                                                , keyTimes "0; 1"
+                                                , keySplines "0.3, 0.61, 0.355, 1"
+                                                , repeatCount "indefinite"
+                                                ]
+                                                []
+                                            ]
+                                        ]
+                                        , circle
+                                            [ cx "22"
+                                            , cy "22"
+                                            , r "1"
+                                            ]
+                                            [ animate
+                                                [ attributeName "r"
+                                                , begin "-0.9s"
+                                                , dur "1.8s"
+                                                , values "1; 20"
+                                                , calcMode "spline"
+                                                , keyTimes "0; 1"
+                                                , keySplines "0.165, 0.84, 0.44, 1"
+                                                , repeatCount "indefinite"
+                                                ]
+                                                []
+                                            , animate
+                                                [ attributeName "stroke-opacity"
+                                                , begin "-0.9s"
+                                                , dur "1.8s"
+                                                , values "1; 0"
+                                                , calcMode "spline"
+                                                , keyTimes "0; 1"
+                                                , keySplines "0.3, 0.61, 0.355, 1"
+                                                , repeatCount "indefinite"
+                                                ]
+                                                []
+                                            ]
+                                        ]
+                                    ]
                         ]
 
                 Success items ->
@@ -528,7 +602,15 @@ page feed =
                 NotAsked ->
                     figure []
                         [
-                            img [ width 160, height 68, src "/svg/hnpwa.svg" , alt "HN PWA logo" ] []
+                            svg [ width "160", height "68", viewBox "0 0 1725 735", attribute "role" "img", attribute "labelledby" "hnpwaLogoName" ]
+                            [ G.title [ id "hnpwaLogoName"] [ G.text "HN PWA" ]
+                            , desc [] [ G.text "Logo of Hacker News Progressive Web Application. More info on hnpwa.com" ]
+                            , rect [ fill "#f27521", width "1638", height "641", y "43", x "47" ] []
+                            , g []
+                                [ path [ fill "white", d "M329.85 554.63v-165.9h82.58v165.9h47.3V180.37h-47.3V332.1h-82.58V180.37h-47.3v374.26zM563.1 180.37h-50.4v374.26h42.26V284.05l95.38 270.58h44.58V180.37h-41.87v255.4z" ] []
+                                , path [ fill "black", d "M750.05 180.37v374.26h47.3V416.56h23.66c29.08 0 51.96-9.1 69.02-29.34 16.67-19.72 27.14-50.57 27.14-89 0-37.43-10.47-69.3-27.14-88.5-17.06-20.24-39.55-29.35-69-29.35zm47.3 57.15h23.27c17.06 0 27.53 3.54 35.67 13.66 7.74 9.1 12 25.8 12 47.54 0 21.24-4.26 37.42-11.62 46.53-8.53 11.12-19 14.16-36.06 14.16h-23.26zM1000.14 554.63h43.42l43.8-279.68 44.6 279.68h43.8l67.86-374.26h-47.3l-43.42 269.57-43.04-269.57h-43.42l-43.04 269.57-44.6-269.57h-47.68zM1302.5 468.14h73.65l18.23 86.5h48.07l-81.8-374.27h-44.6l-79.47 374.26h48.07zm61.25-56.64h-49.63l24.8-144.64z" ] []
+                                ]
+                            ]
                         ]
 
 
@@ -846,7 +928,7 @@ getPage : Page -> Cmd Data
 getPage page =
     case page of
         Blank ->
-            Cmd.none
+            Cmd.none 
 
         Top ->
             loadpage Top
@@ -1183,7 +1265,7 @@ init : Location -> ( Feed, Cmd Data )
 init loc =
     case pathto loc of
         Just Blank ->
-            ( initialFeed, getPage Top )
+            ( initialFeed, sleep 50 |> (\_ -> getPage Top) )
 
         Just Top ->
             ( initialFeed, getPage Top )
