@@ -6,9 +6,11 @@
   "display": "standalone",
   "dir": "ltr",
   "lang": "en-US",
+  "theme_color": "#185858",
+  "background_color": "#ededed",
   "icons": [{
-    "src": "svg/hnpwa.svg",
-    "sizes": "48x48 72x72 96x96 144x144 168x168 192x192",
+    "src": "hn.svg",
+    "sizes": "48x48 72x72 96x96 144x144 168x168 192x192 256x256 384x384 512x512",
     "type": "image/svg+xml"
   }],
   "related_applications": [{
