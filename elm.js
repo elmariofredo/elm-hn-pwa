@@ -23735,24 +23735,20 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 								_0: _elm_lang$html$Html_Attributes$class(_p31.type_),
 								_1: {
 									ctor: '::',
-									_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'article'),
+									_0: _elm_lang$html$Html_Attributes$tabindex(0),
 									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$tabindex(0),
+										_0: A2(
+											_elm_lang$html$Html_Attributes$attribute,
+											'aria-setsize',
+											A2(setSize, items, _p31)),
 										_1: {
 											ctor: '::',
 											_0: A2(
 												_elm_lang$html$Html_Attributes$attribute,
-												'aria-setsize',
-												A2(setSize, items, _p31)),
-											_1: {
-												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html_Attributes$attribute,
-													'aria-posinset',
-													posInSet(_p30)),
-												_1: {ctor: '[]'}
-											}
+												'aria-posinset',
+												posInSet(_p30)),
+											_1: {ctor: '[]'}
 										}
 									}
 								}
@@ -23973,24 +23969,20 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 							_0: _elm_lang$html$Html_Attributes$class(_p47.type_),
 							_1: {
 								ctor: '::',
-								_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'article'),
+								_0: _elm_lang$html$Html_Attributes$tabindex(0),
 								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$tabindex(0),
+									_0: A2(
+										_elm_lang$html$Html_Attributes$attribute,
+										'aria-setsize',
+										A2(setSize, items, _p47)),
 									_1: {
 										ctor: '::',
 										_0: A2(
 											_elm_lang$html$Html_Attributes$attribute,
-											'aria-setsize',
-											A2(setSize, items, _p47)),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html_Attributes$attribute,
-												'aria-posinset',
-												posInSet(_p46)),
-											_1: {ctor: '[]'}
-										}
+											'aria-posinset',
+											posInSet(_p46)),
+										_1: {ctor: '[]'}
 									}
 								}
 							}

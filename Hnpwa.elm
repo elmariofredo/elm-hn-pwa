@@ -264,7 +264,6 @@ page feed =
                 Lz.lazy (K.node "article"
                     [ id <| item.type_ ++ "-" ++ toString item.id
                     , class item.type_
-                    , attribute "role" "article"
                     , tabindex 0
                     , attribute "aria-setsize" <| setSize items item
                     , attribute "aria-posinset" <| posInSet index 
@@ -288,7 +287,6 @@ page feed =
                 |> Lz.lazy (K.node "article"
                     [ id <| item.type_ ++ "-" ++ toString item.id
                     , class item.type_
-                    , attribute "role" "article"
                     , tabindex 0
                     , attribute "aria-setsize" <| setSize items item
                     , attribute "aria-posinset" <| posInSet index 
