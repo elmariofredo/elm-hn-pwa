@@ -1327,23 +1327,23 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 		case 'Loading':
 			return A2(
 				_elm_lang$html$Html$main_,
-				{
-					ctor: '::',
-					_0: A2(_elm_lang$html$Html_Attributes$attribute, 'aria-busy', 'true'),
-					_1: {
-						ctor: '::',
-						_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'feed'),
-						_1: {ctor: '[]'}
-					}
-				},
+				{ctor: '[]'},
 				{
 					ctor: '::',
 					_0: A2(
 						_elm_lang$html$Html$div,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$id('loading'),
-							_1: {ctor: '[]'}
+							_0: _elm_lang$html$Html_Attributes$class('loading'),
+							_1: {
+								ctor: '::',
+								_0: A2(_elm_lang$html$Html_Attributes$attribute, 'aria-busy', 'true'),
+								_1: {
+									ctor: '::',
+									_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'feed'),
+									_1: {ctor: '[]'}
+								}
+							}
 						},
 						{
 							ctor: '::',
@@ -1619,42 +1619,64 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 			var _p50 = feed.page;
 			if (_p50.ctor === 'SingleItem') {
 				return A2(
-					_elm_lang$html$Html_Lazy$lazy,
-					A2(
-						_elm_lang$html$Html_Keyed$node,
-						'main',
-						{
-							ctor: '::',
-							_0: A2(_elm_lang$html$Html_Attributes$attribute, 'aria-busy', 'false'),
-							_1: {
-								ctor: '::',
-								_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'feed'),
-								_1: {ctor: '[]'}
-							}
-						}),
-					comments(_p51));
+					_elm_lang$html$Html$main_,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html_Lazy$lazy,
+							A2(
+								_elm_lang$html$Html_Keyed$node,
+								'div',
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('feed'),
+									_1: {
+										ctor: '::',
+										_0: A2(_elm_lang$html$Html_Attributes$attribute, 'aria-busy', 'false'),
+										_1: {
+											ctor: '::',
+											_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'feed'),
+											_1: {ctor: '[]'}
+										}
+									}
+								}),
+							comments(_p51)),
+						_1: {ctor: '[]'}
+					});
 			} else {
 				return A2(
-					_elm_lang$html$Html_Lazy$lazy,
-					A2(
-						_elm_lang$html$Html_Keyed$node,
-						'main',
-						{
-							ctor: '::',
-							_0: A2(_elm_lang$html$Html_Attributes$attribute, 'aria-busy', 'false'),
-							_1: {
-								ctor: '::',
-								_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'feed'),
-								_1: {ctor: '[]'}
-							}
-						}),
-					stories(
-						A2(
-							_elm_lang$core$List$filter,
-							function (i) {
-								return !_elm_lang$core$Native_Utils.eq(i.type_, 'comment');
-							},
-							_p51)));
+					_elm_lang$html$Html$main_,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html_Lazy$lazy,
+							A2(
+								_elm_lang$html$Html_Keyed$node,
+								'div',
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('feed'),
+									_1: {
+										ctor: '::',
+										_0: A2(_elm_lang$html$Html_Attributes$attribute, 'aria-busy', 'false'),
+										_1: {
+											ctor: '::',
+											_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'feed'),
+											_1: {ctor: '[]'}
+										}
+									}
+								}),
+							stories(
+								A2(
+									_elm_lang$core$List$filter,
+									function (i) {
+										return !_elm_lang$core$Native_Utils.eq(i.type_, 'comment');
+									},
+									_p51))),
+						_1: {ctor: '[]'}
+					});
 			}
 		case 'Failure':
 			return A2(

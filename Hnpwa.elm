@@ -500,9 +500,9 @@ page feed =
     in
             case feed.data of 
                 Loading ->
-                    main_ [ attribute "aria-busy" "true", attribute "role" "feed" ]
+                    main_ []
                         [
-                            div [ id "loading" ] [
+                            div [ class "loading", attribute "aria-busy" "true", attribute "role" "feed"  ] [
                                 svg
                                     [ viewBox "0 0 44 44"
                                     , width "100px"
@@ -587,13 +587,17 @@ page feed =
                 Success items ->
                     case feed.page of
                         SingleItem id ->
-                            items
-                                |> comments
-                                |> Lz.lazy (K.node "main" [ attribute "aria-busy" "false", attribute "role" "feed" ])
+                            main_ []
+                                [ items
+                                    |> comments
+                                    |> Lz.lazy (K.node "div" [ class "feed", attribute "aria-busy" "false", attribute "role" "feed" ])
+                                ]
                         _ ->
-                            List.filter (\i -> i.type_ /= "comment") items
-                                |> stories 
-                                |> Lz.lazy (K.node "main" [ attribute "aria-busy" "false", attribute "role" "feed" ])
+                            main_ []
+                                [ List.filter (\i -> i.type_ /= "comment") items
+                                    |> stories 
+                                    |> Lz.lazy (K.node "div" [ class "feed", attribute "aria-busy" "false", attribute "role" "feed" ])
+                                ]
 
                 Failure err ->
                     p [ id "err" ]
