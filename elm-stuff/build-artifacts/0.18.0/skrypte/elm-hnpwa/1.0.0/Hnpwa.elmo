@@ -1319,22 +1319,22 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 		case 'Loading':
 			return A2(
 				_elm_lang$html$Html$main_,
-				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('loading'),
+					_1: {ctor: '[]'}
+				},
 				{
 					ctor: '::',
 					_0: A2(
 						_elm_lang$html$Html$div,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('loading'),
+							_0: A2(_elm_lang$html$Html_Attributes$attribute, 'aria-busy', 'true'),
 							_1: {
 								ctor: '::',
-								_0: A2(_elm_lang$html$Html_Attributes$attribute, 'aria-busy', 'true'),
-								_1: {
-									ctor: '::',
-									_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'feed'),
-									_1: {ctor: '[]'}
-								}
+								_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'feed'),
+								_1: {ctor: '[]'}
 							}
 						},
 						{

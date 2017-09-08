@@ -12,9 +12,48 @@
     "src": "hn.svg",
     "sizes": "48x48 72x72 96x96 144x144 168x168 192x192 256x256 384x384 512x512",
     "type": "image/svg+xml"
+  }
+  , {
+    "src": "hn_72.png",
+    "sizes": "72x72",
+    "type": "image/png"
+  }
+  , {
+    "src": "hn_96.png",
+    "sizes": "96x96",
+    "type": "image/png"
+  }
+  , {
+    "src": "hn_144.png",
+    "sizes": "144x144",
+    "type": "image/png"
+  }
+  , {
+    "src": "hn_168.png",
+    "sizes": "168x168",
+    "type": "image/png"
+  }
+  , {
+    "src": "hn_192.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  }
+  , {
+    "src": "hn_256.png",
+    "sizes": "256x256",
+    "type": "image/png"
+  }
+  , {
+    "src": "hn_384.png",
+    "sizes": "384x384",
+    "type": "image/png"
+  }
+  , {
+    "src": "hn_512.png",
+    "sizes": "512x512",
+    "type": "image/png"
   }],
   "related_applications": [{
-    "platform": "web",
-    "url": "https://hnpwa.skingrapher.com"
+    "platform": "web"
   }]
 }

@@ -498,9 +498,9 @@ page feed =
     in
             case feed.data of 
                 Loading ->
-                    main_ []
+                    main_ [ class "loading" ]
                         [
-                            div [ class "loading", attribute "aria-busy" "true", attribute "role" "feed"  ] [
+                            div [ attribute "aria-busy" "true", attribute "role" "feed"  ] [
                                 svg
                                     [ viewBox "0 0 44 44"
                                     , width "100px"
