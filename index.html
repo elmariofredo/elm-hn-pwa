@@ -1637,20 +1637,27 @@ globalElm[publicModule]=Elm[publicModule];}}).call(this);
 
             /* SERVICE WORKER REGISTRATION */
             if ("serviceWorker" in navigator) {
-                navigator.serviceWorker.register("sw.js", {
-                    scope: "./"
+                
+                // if SW already registered
+                if (navigator.serviceWorker.controller) {
+                    console.log("this page is controlled by a service worker");
+                }
+                // register if not
+                else {
+                    navigator.serviceWorker.register("sw.js"
+                        , { scope: "./#"}
+                    );
+                }
+
+                navigator.serviceWorker.addEventListener("controllerchange", function() {
+                    window.location.reload();
                 });
+
             }
             else {
                 console.log("Service workers are not supported.");
             }
 
-            /* Load controlled and uncontrolled pages once the worker is active */
-            navigator.serviceWorker.ready.then(reload);
-
-            function reload(){
-                window.location.reload();
-            }
         </script>
     </body>
 </html>

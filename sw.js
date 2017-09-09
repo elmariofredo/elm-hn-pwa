@@ -12,72 +12,71 @@ var CACHE = "hn-cache"
 
 var inCache = [
     "/index.html"
-    , "/hn.svg"
 ];
 
+var timeout = 400;
 
 /* SW INSTALL */
+
 self.addEventListener("install", function (e) {
-    console.log("Service Worker being installed")
-    /* Ask the service worker to keep installing until the returning promise resolves */
-    e.waitUntil(precache());
+    console.log("Service Worker being installed");
+
+    /* PRECACHE 
+     * Open a cache and use addAll()
+     * with an array of assets
+     * to add all of them to the cache.
+     * return a promise resolving when all the assets are added
+     * */
+    e.waitUntil(
+        caches.open(CACHE).then (function (c) {
+            c.addAll(
+                inCache
+            );
+        }));
 });
 
 /* SW FETCH
  * On fetch, use cache but update the entry with the latest contents from the server
  * */
 self.addEventListener("fetch", function(e) {
-    console.log("Service Worker serving the asset")
-    /* Try network and if it fails, go for the cached copy */
-    e.respondWith(fromNetwork(e.request, 400).catch(function(){
-        return fromCache(e.request)
-    }))
-})
+    console.log("Service Worker tries a connexion to network...");
+    /* FROM NETWORK 
+    /* Try network
+     * Time limited network request.
+     * if the network fails
+     * or the response is not served before timeout,
+     * the promise is rejected
+     * and go for the cached copy
+     * */
+    e.respondWith(
+        new Promise(function (getNew, useCachedContent) {
 
-/* PRECACHE 
- * Open a cache and use addAll()
- * with an array of assets
- * to add all of them to the cache.
- * return a promise resolving when all the assets are added
- * */
-function precache() {
-  return caches.open(CACHE).then(function (cache) {
-    return cache.addAll(
-        inCache
-    );
-  });
-}
+            var sto = setTimeout(useCachedContent, timeout);
 
-/* FROM NETWORK 
- * Time limited network request.
- * if the network fails
- * or the response is not served before timeout,
- * the promise is rejected
- * */
-function fromNetwork(request, timeout) {
-  return new Promise(function (fulfill, reject) {
-    /* Reject in case of timeout */
-    var timeoutId = setTimeout(reject, timeout);
-    /* Fulfill in case of success*/
-    fetch(request).then(function (response) {
-      clearTimeout(timeoutId);
-      fulfill(response);
-    /* Reject also if network fetch rejects */
-    }, reject);
-  });
-}
-
-/* FROM CACHE 
- * Open the cache where the assets were stored
- * and search for the requested resource.
- * notice that in case of no matching,
- * the promise still resolves
- * but it does with undefined as value
- * */
-function fromCache(request) {
-  return caches.open(CACHE).then(function (cache) {
-    return cache.match(request).then(function (matching) {
-      return matching || Promise.reject("no-match");
-    });
-  });
-}
+            /* fullfill in case of success*/
+            fetch(e.request).then(
+                    function(stories) {
+                        clearTimeout(sto);
+                        getNew(stories);
+                    }
+            /* reject in case of timeout */
+            , useCachedContent 
+            );
+        }).catch(
+            /* FROM CACHE 
+             * Open the cache
+             * and search for the requested resource.
+             * notice that in case of no matching,
+             * the promise still resolves
+             * but it does with undefined as value
+             * */
+            function (){
+                caches.open(CACHE).then(
+                    function (cache) {
+                        cache.match(e.request).then(
+                            function (matching) {
+                                matching || Promise.reject("CthulhuFhtagn");
+                            });
+                    });
+            }));
+});
