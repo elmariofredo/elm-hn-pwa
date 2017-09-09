@@ -1607,10 +1607,19 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 					_1: {ctor: '[]'}
 				});
 		case 'Success':
-			var _p51 = _p49._0;
+			var _p52 = _p49._0;
 			var _p50 = feed.page;
 			if (_p50.ctor === 'SingleItem') {
-				return A2(
+				var unique = _elm_lang$core$List$head(_p52);
+				var typeOfItem = function () {
+					var _p51 = unique;
+					if (_p51.ctor === 'Just') {
+						return _p51._0.type_;
+					} else {
+						return '';
+					}
+				}();
+				return _elm_lang$core$Native_Utils.eq(typeOfItem, 'job') ? A2(
 					_elm_lang$html$Html$main_,
 					{ctor: '[]'},
 					{
@@ -1633,7 +1642,32 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 										}
 									}
 								}),
-							comments(_p51)),
+							stories(_p52)),
+						_1: {ctor: '[]'}
+					}) : A2(
+					_elm_lang$html$Html$main_,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html_Lazy$lazy,
+							A2(
+								_elm_lang$html$Html_Keyed$node,
+								'div',
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('feed'),
+									_1: {
+										ctor: '::',
+										_0: A2(_elm_lang$html$Html_Attributes$attribute, 'aria-busy', 'false'),
+										_1: {
+											ctor: '::',
+											_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'feed'),
+											_1: {ctor: '[]'}
+										}
+									}
+								}),
+							comments(_p52)),
 						_1: {ctor: '[]'}
 					});
 			} else {
@@ -1666,7 +1700,7 @@ var _skrypte$elm_hnpwa$Hnpwa$page = function (feed) {
 									function (i) {
 										return !_elm_lang$core$Native_Utils.eq(i.type_, 'comment');
 									},
-									_p51))),
+									_p52))),
 						_1: {ctor: '[]'}
 					});
 			}
@@ -1811,7 +1845,7 @@ var _skrypte$elm_hnpwa$Hnpwa$main = A2(
 		init: _skrypte$elm_hnpwa$Hnpwa$init,
 		update: _skrypte$elm_hnpwa$Hnpwa$update,
 		view: _skrypte$elm_hnpwa$Hnpwa$page,
-		subscriptions: function (_p52) {
+		subscriptions: function (_p53) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();

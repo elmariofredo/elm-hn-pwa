@@ -585,11 +585,30 @@ page feed =
                 Success items ->
                     case feed.page of
                         SingleItem id ->
-                            main_ []
-                                [ items
-                                    |> comments
-                                    |> Lz.lazy (K.node "div" [ class "feed", attribute "aria-busy" "false", attribute "role" "feed" ])
-                                ]
+                            let
+                                unique : Maybe Item
+                                unique = items |> head
+
+                                typeOfItem : String
+                                typeOfItem =
+                                    case unique of
+                                        Just i ->
+                                            i.type_
+                                        Nothing ->
+                                            ""
+                            in
+                                if typeOfItem == "job" then
+                                    main_ []
+                                        [ items
+                                            |> stories 
+                                            |> Lz.lazy (K.node "div" [ class "feed", attribute "aria-busy" "false", attribute "role" "feed" ])
+                                        ]
+                                else
+                                    main_ []
+                                        [ items
+                                            |> comments
+                                            |> Lz.lazy (K.node "div" [ class "feed", attribute "aria-busy" "false", attribute "role" "feed" ])
+                                        ]
                         _ ->
                             main_ []
                                 [ List.filter (\i -> i.type_ /= "comment") items
