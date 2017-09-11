@@ -1005,8 +1005,7 @@ delayPage t page =
 requestConf : Config
 requestConf =
     { headers =
-        [ Http.header "Origin" uri 
-        , Http.header "Accept" "application/json"
+        [ Http.header "Accept" "application/json"
         ]
     , withCredentials = False
     , timeout = Just <| 3 * second  

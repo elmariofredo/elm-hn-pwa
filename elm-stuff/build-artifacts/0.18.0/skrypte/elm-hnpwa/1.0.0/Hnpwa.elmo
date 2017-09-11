@@ -52,6 +52,15 @@ var _skrypte$elm_hnpwa$Hnpwa$routeTo = function (page) {
 		A2(_elm_lang$core$String$join, '/', p));
 };
 var _skrypte$elm_hnpwa$Hnpwa$timeNow = A2(_elm_lang$core$Task$andThen, _elm_lang$core$Task$succeed, _elm_lang$core$Time$now);
+var _skrypte$elm_hnpwa$Hnpwa$requestConf = {
+	headers: {
+		ctor: '::',
+		_0: A2(_elm_lang$http$Http$header, 'Accept', 'application/json'),
+		_1: {ctor: '[]'}
+	},
+	withCredentials: false,
+	timeout: _elm_lang$core$Maybe$Just(3 * _elm_lang$core$Time$second)
+};
 var _skrypte$elm_hnpwa$Hnpwa$maxItemsPerPage = 30;
 var _skrypte$elm_hnpwa$Hnpwa$pagination = F3(
 	function (page, pagetype, items) {
@@ -495,19 +504,6 @@ var _skrypte$elm_hnpwa$Hnpwa$itemurl = function (id) {
 					_elm_lang$core$Basics_ops['++'],
 					_elm_lang$core$Basics$toString(id),
 					'.json'))));
-};
-var _skrypte$elm_hnpwa$Hnpwa$requestConf = {
-	headers: {
-		ctor: '::',
-		_0: A2(_elm_lang$http$Http$header, 'Origin', _skrypte$elm_hnpwa$Hnpwa$uri),
-		_1: {
-			ctor: '::',
-			_0: A2(_elm_lang$http$Http$header, 'Accept', 'application/json'),
-			_1: {ctor: '[]'}
-		}
-	},
-	withCredentials: false,
-	timeout: _elm_lang$core$Maybe$Just(3 * _elm_lang$core$Time$second)
 };
 var _skrypte$elm_hnpwa$Hnpwa$Feed = F5(
 	function (a, b, c, d, e) {
