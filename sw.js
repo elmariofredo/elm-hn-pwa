@@ -19,7 +19,7 @@ var SHELL = "hn-shell";
 
 var DATA = "hn-items";
 
-var STORIES = "id-stories";
+var STORIES = "hn-stories";
 
 var inCache = [
     "/"
@@ -78,19 +78,6 @@ function getItem(request){
 
 function getStories(request) {
 
-    var cached = self.caches.open(STORIES).then(
-        function (cache) {
-            return cache.match(request).then(
-                // get json object in cache
-                // or fetch a request if not cached
-                function (jsonCache) {
-                    return jsonCache;
-                }
-            );
-        }
-    );
-
-
     var p = new Promise(
         function (listOf, nothing) {
             // fetch async request
@@ -112,7 +99,19 @@ function getStories(request) {
         }
     );
 
-    return p;
+    var cached = self.caches.open(STORIES).then(
+        function (cache) {
+            return cache.match(request).then(
+                // get json object in cache
+                // or fetch a request if not cached
+                function (jsonCache) {
+                    return jsonCache || p;
+                }
+            );
+        }
+    );
+
+    return cached;
 }
 
 
