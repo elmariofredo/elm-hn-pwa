@@ -78,7 +78,20 @@ function getItem(request){
 
 function getStories(request) {
 
-    return new Promise(
+    var cached = self.caches.open(STORIES).then(
+        function (cache) {
+            return cache.match(request).then(
+                // get json object in cache
+                // or fetch a request if not cached
+                function (jsonCache) {
+                    return jsonCache;
+                }
+            );
+        }
+    );
+
+
+    var p = new Promise(
         function (listOf, nothing) {
             // fetch async request
             return fetch(request).then(
@@ -87,9 +100,9 @@ function getStories(request) {
                     return self.caches.open(STORIES).then(
                         // put in cache for next use
                         function (cache) {
-                            return cache.add(request);
-
-                            listOf(ids);
+                            return cache.add(request).then(
+                                listOf(ids)
+                            );
                         }
                     );
                 }
@@ -98,6 +111,8 @@ function getStories(request) {
             );
         }
     );
+
+    return p;
 }
 
 
@@ -190,12 +205,10 @@ self.addEventListener("fetch", function(e) {
         );
     }
 
-    /*
     // stories request
     else if (isStoriesUrl != null) {
         e.respondWith(
             getStories(req)
         );
     }
-    */
 });
