@@ -87,7 +87,7 @@ function getStories(request) {
                     return self.caches.open(STORIES).then(
                         // put in cache for next use
                         function (cache) {
-                            return cache.add(request).then(
+                            return cache.put(request, ids.clone()).then(
                                 listOf(ids)
                             );
                         }
