@@ -112,23 +112,13 @@ function putInCache(request) {
             return fetch(request).then(
                 function (response) {
 
-                    if (response.status == 200 ) {
-                        
-                        var contentType = { "Content-Type": "application/json" };
-
-                        var r = new Response(
-                            response.clone().json()
-                            , { headers: contentType }
-                        );
-
-                        return self.caches.open(DATA).then(
-                            function (cache) {
-                                return cache.put(request, r).then(
-                                    item(response)
-                                );
-                            }
-                        );
-                    }
+                    return self.caches.open(DATA).then(
+                        function (cache) {
+                            return cache.add(request).then(
+                                item(response)
+                            );
+                        }
+                    );
                 }
 
                 , nothing
