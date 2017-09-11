@@ -8,75 +8,204 @@
  * DOCS
  * https://serviceworke.rs/strategy-network-or-cache_index_doc.html
  */
-var CACHE = "hn-cache"
+
+
+
+/* VARIABLES 
+ * */
+
+
+var SHELL = "hn-shell";
+
+var DATA = "hn-items";
+
+var STORIES = "id-stories";
 
 var inCache = [
-    "/index.html"
+    "/"
+    , "/index.html"
+    , "/hn.svg"
 ];
 
-var timeout = 400;
+var api = "https://hacker-news.firebaseio.com/";
 
-/* SW INSTALL */
+var versioning = "v0";
+
+var endpoint = api + versioning + "/item/";
+
+var timeout = 800;
+
+var maxItems = 30;
+
+
+
+/* FUNCTIONS
+ * */
+
+
+// get first max items from json array
+// which is returned in response of request
+function jsonify(response) {
+    return Promise.resolve(response).then(
+        function (r) {
+            return r.json().then(
+                function (json) {
+                    return json.slice(0, maxItems);
+                }
+            );
+        }
+    );
+}
+
+
+// get item from cache
+// elsewise from network
+function getItem(request){
+
+    return self.caches.open(DATA).then(
+        function (cache) {
+            return cache.match(request).then(
+                // get json object in cache
+                // or fetch a request if not cached
+                function (jsonCache) {
+                    return jsonCache || putInCache(request);
+                }
+            );
+        }
+    );
+}
+
+
+function getStories(request) {
+
+    return new Promise(
+        function (listOf, nothing) {
+            // fetch async request
+            return fetch(request).then(
+                // if response
+                function (ids) {
+                    return self.caches.open(STORIES).then(
+                        // put in cache for next use
+                        function (cache) {
+                            return cache.add(request);
+
+                            listOf(ids);
+                        }
+                    );
+                }
+                // elsewise nothing
+                , nothing
+            );
+        }
+    );
+}
+
+
+// put result for item page
+// in cache
+// keyed by its url
+// value is a json array
+function putInCache(request) {
+
+    return new Promise(
+        function (item, nothing) {
+            return fetch(request).then(
+                function (response) {
+
+                    if (response.status == 200 ) {
+                        
+                        var contentType = { "Content-Type": "application/json" };
+
+                        var r = new Response(
+                            response.clone().json()
+                            , { headers: contentType }
+                        );
+
+                        return self.caches.open(DATA).then(
+                            function (cache) {
+                                return cache.put(request, r).then(
+                                    item(response)
+                                );
+                            }
+                        );
+                    }
+                }
+
+                , nothing
+            );
+        }
+    );
+}
+
+
+
+/* SW INSTALL 
+ * */
+
 
 self.addEventListener("install", function (e) {
-    console.log("Service Worker being installed");
 
-    /* PRECACHE 
-     * Open a cache and use addAll()
-     * with an array of assets
-     * to add all of them to the cache.
-     * return a promise resolving when all the assets are added
-     * */
     e.waitUntil(
-        caches.open(CACHE).then (function (c) {
-            c.addAll(
-                inCache
-            );
-        }));
+        // put site in cache
+        caches.open(SHELL).then(
+            function (c) {
+                return c.addAll(
+                    inCache
+                );
+            }
+        )
+        .then(
+            function () {
+                // new SW becomes active immediately
+                return self.skipWaiting();
+            }
+        )
+    );
 });
 
-/* SW FETCH
- * On fetch, use cache but update the entry with the latest contents from the server
+
+
+/* SW ACTIVATE 
  * */
+
+
+self.addEventListener("activate", function (e) {
+
+    e.waitUntil(
+        // set SW itself as controller for all clients within its scope
+        self.clients.claim()
+    );
+});
+
+
+
+/* SW FETCH
+ * */
+
+
 self.addEventListener("fetch", function(e) {
-    console.log("Service Worker tries a connexion to network...");
-    /* FROM NETWORK 
-    /* Try network
-     * Time limited network request.
-     * if the network fails
-     * or the response is not served before timeout,
-     * the promise is rejected
-     * and go for the cached copy
-     * */
-    e.respondWith(
-        new Promise(function (getNew, useCachedContent) {
 
-            var sto = setTimeout(useCachedContent, timeout);
+    var req = e.request;
+    var url = new URL(req.url);
+    //var url = req.url;
+    var item ="\/item\/";
+    var isItemUrl = url.pathname.match(item);
+    var stories = "stories";
+    var isStoriesUrl = url.pathname.match(stories);
 
-            /* fullfill in case of success*/
-            fetch(e.request).then(
-                    function(stories) {
-                        clearTimeout(sto);
-                        getNew(stories);
-                    }
-            /* reject in case of timeout */
-            , useCachedContent 
-            );
-        }).catch(
-            /* FROM CACHE 
-             * Open the cache
-             * and search for the requested resource.
-             * notice that in case of no matching,
-             * the promise still resolves
-             * but it does with undefined as value
-             * */
-            function (){
-                caches.open(CACHE).then(
-                    function (cache) {
-                        cache.match(e.request).then(
-                            function (matching) {
-                                matching || Promise.reject("CthulhuFhtagn");
-                            });
-                    });
-            }));
+    // item request
+    if (isItemUrl != null) {
+        e.respondWith(
+            getItem(req)
+        );
+    }
+
+    /*
+    // stories request
+    else if (isStoriesUrl != null) {
+        e.respondWith(
+            getStories(req)
+        );
+    }
+    */
 });
