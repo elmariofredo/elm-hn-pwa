@@ -1,0 +1,14 @@
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+
+DirectoryIndex index.html 
+AddType image/svg+xml svg
+
+
+RewriteRule ^off\/?$ /#/off [NE,R]
+
+
+RewriteCond %{HTTPS} off
+RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R,L]
+</IfModule>
