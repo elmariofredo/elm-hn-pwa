@@ -21,10 +21,13 @@ var DATA = "hn-items";
 
 var STORIES = "hn-stories";
 
+var now = Date.now;
+
 var inCache = [
     "/"
     , "/index.html"
     , "/hn.svg"
+    , "/off"
 ];
 
 var api = "https://hacker-news.firebaseio.com/";
@@ -107,7 +110,23 @@ function getStories(request) {
                 function (jsonCache) {
                     return jsonCache || p;
                 }
-            );
+            ).catch(
+                function () {
+                    return self.caches.open(SHELL).then(
+                        function (c) {
+                            return c.match("/off").then(
+                                function (page) {
+                                    console.log("getting offline...");
+                                    var j = [ 2501 ];
+                                    var r = new Response(JSON.stringify(j), {headers: {"Content-Type": "application/json"}, status: 200});
+                                    return Promise.resolve(r);
+
+                                }
+                            )
+                        }
+                    )
+                }
+            )
         }
     );
 
@@ -121,26 +140,51 @@ function getStories(request) {
 // value is a json array
 function putInCache(request) {
 
-    return new Promise(
-        function (item, nothing) {
-            return fetch(request).then(
-                function (response) {
-
-                    return self.caches.open(DATA).then(
-                        function (cache) {
-                            return cache.add(request).then(
-                                item(response)
-                            );
-                        }
-                    );
-                }
-
-                , nothing
-            );
+    function is2501(req) {
+        if (req.url === endpoint + "2501.json") {
+            return true;
         }
-    );
-}
+        else {
+            return false;
+        }
+    } 
+    
+    if (is2501(request) === false) {
+        return new Promise(
+            function (item, nothing) {
+                return fetch(request).then(
+                    function (response) {
 
+                        return self.caches.open(DATA).then(
+                            function (cache) {
+                                return cache.add(request).then(
+                                    item(response)
+                                );
+                            }
+                        );
+                    }
+
+                    , nothing
+                );
+            }
+        );
+    }
+
+    else {
+        var off = {
+            time : Math.ceil(Date.now() / 1000)
+            , by : "skingrapher"
+            , title : "WARNING: you are offline"
+            , id : 2501
+            , type: "story"
+        };
+
+        return Promise.resolve(
+            new Response(JSON.stringify(off), {headers: {"Content-Type": "application/json"}, status: 200})
+        );
+
+    }
+}
 
 
 /* SW INSTALL 
@@ -187,7 +231,7 @@ self.addEventListener("activate", function (e) {
  * */
 
 
-self.addEventListener("fetch", function(e) {
+self.addEventListener("fetch", function (e) {
 
     var req = e.request;
     var url = new URL(req.url);
@@ -202,6 +246,14 @@ self.addEventListener("fetch", function(e) {
         e.respondWith(
             getItem(req)
         );
+        /*
+        if (req.url === endpoint + "2501.json") {
+            e.respondWith(
+                function() {
+                }
+            );
+        }
+        */
     }
 
     // stories request
@@ -210,4 +262,5 @@ self.addEventListener("fetch", function(e) {
             getStories(req)
         );
     }
+
 });

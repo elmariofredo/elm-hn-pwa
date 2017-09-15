@@ -75,6 +75,9 @@ api page =
             Blank ->
                 Nothing
 
+            Offline ->
+                Nothing
+
             Top ->
                 Just <| url ++ "topstories.json"
 
@@ -126,6 +129,7 @@ nohtml = Html.map never <| text ""
 
 type Page
     = Blank
+    | Offline
     | Top
     | New
     | Show
@@ -152,6 +156,9 @@ pagination page pagetype items =
                     1
 
                 Blank ->
+                    0
+
+                Offline ->
                     0
 
                 Top ->
@@ -216,6 +223,11 @@ type alias Feed =
 initialFeed : Feed
 initialFeed =
     { data = NotAsked, page = Blank, now = 0, comments = NotAsked, index = empty }
+
+
+offlineFeed : Feed
+offlineFeed =
+    { data = NotAsked, page = Offline, now = 0, comments = NotAsked, index = empty }
 
 
 
@@ -956,6 +968,9 @@ getPage page =
         Blank ->
             Cmd.none 
 
+        Offline ->
+            Cmd.none 
+
         Top ->
             loadpage Top
 
@@ -1225,6 +1240,7 @@ route =
         , Url.map Ask <| s "ask"
         , Url.map Jobs <| s "jobs"
         , Url.map SingleItem <| s "item" </> Url.int
+        , Url.map Offline <| s "off"
         ]
 
 
@@ -1257,6 +1273,10 @@ routeTo page =
 
                 Blank ->
                     []
+
+                Offline ->
+                    [ "off" ]
+
     in
         "/#/" ++ join "/" p
 
@@ -1293,6 +1313,9 @@ init loc =
     case pathto loc of
         Just Blank ->
             ( initialFeed, delayPage 100 Top )
+
+        Just Offline ->
+            ( offlineFeed, Cmd.none )
 
         Just Top ->
             ( initialFeed, getPage Top )

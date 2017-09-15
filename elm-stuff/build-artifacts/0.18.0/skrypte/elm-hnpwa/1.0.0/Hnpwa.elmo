@@ -42,8 +42,14 @@ var _skrypte$elm_hnpwa$Hnpwa$routeTo = function (page) {
 						_1: {ctor: '[]'}
 					}
 				};
-			default:
+			case 'Blank':
 				return {ctor: '[]'};
+			default:
+				return {
+					ctor: '::',
+					_0: 'off',
+					_1: {ctor: '[]'}
+				};
 		}
 	}();
 	return A2(
@@ -70,6 +76,8 @@ var _skrypte$elm_hnpwa$Hnpwa$pagination = F3(
 				case 'SingleItem':
 					return 1;
 				case 'Blank':
+					return 0;
+				case 'Offline':
 					return 0;
 				case 'Top':
 					return 500;
@@ -455,6 +463,8 @@ var _skrypte$elm_hnpwa$Hnpwa$api = function (page) {
 	switch (_p14.ctor) {
 		case 'Blank':
 			return _elm_lang$core$Maybe$Nothing;
+		case 'Offline':
+			return _elm_lang$core$Maybe$Nothing;
 		case 'Top':
 			return _elm_lang$core$Maybe$Just(
 				A2(_elm_lang$core$Basics_ops['++'], url, 'topstories.json'));
@@ -599,6 +609,8 @@ var _skrypte$elm_hnpwa$Hnpwa$Ask = {ctor: 'Ask'};
 var _skrypte$elm_hnpwa$Hnpwa$Show = {ctor: 'Show'};
 var _skrypte$elm_hnpwa$Hnpwa$New = {ctor: 'New'};
 var _skrypte$elm_hnpwa$Hnpwa$Top = {ctor: 'Top'};
+var _skrypte$elm_hnpwa$Hnpwa$Offline = {ctor: 'Offline'};
+var _skrypte$elm_hnpwa$Hnpwa$offlineFeed = {data: _krisajenkins$remotedata$RemoteData$NotAsked, page: _skrypte$elm_hnpwa$Hnpwa$Offline, now: 0, comments: _krisajenkins$remotedata$RemoteData$NotAsked, index: _elm_lang$core$Dict$empty};
 var _skrypte$elm_hnpwa$Hnpwa$route = _evancz$url_parser$UrlParser$oneOf(
 	{
 		ctor: '::',
@@ -639,7 +651,14 @@ var _skrypte$elm_hnpwa$Hnpwa$route = _evancz$url_parser$UrlParser$oneOf(
 									_evancz$url_parser$UrlParser_ops['</>'],
 									_evancz$url_parser$UrlParser$s('item'),
 									_evancz$url_parser$UrlParser$int)),
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_evancz$url_parser$UrlParser$map,
+									_skrypte$elm_hnpwa$Hnpwa$Offline,
+									_evancz$url_parser$UrlParser$s('off')),
+								_1: {ctor: '[]'}
+							}
 						}
 					}
 				}
@@ -802,6 +821,8 @@ var _skrypte$elm_hnpwa$Hnpwa$getPage = function (page) {
 	switch (_p18.ctor) {
 		case 'Blank':
 			return _elm_lang$core$Platform_Cmd$none;
+		case 'Offline':
+			return _elm_lang$core$Platform_Cmd$none;
 		case 'Top':
 			return _skrypte$elm_hnpwa$Hnpwa$loadpage(_skrypte$elm_hnpwa$Hnpwa$Top);
 		case 'New':
@@ -921,6 +942,8 @@ var _skrypte$elm_hnpwa$Hnpwa$init = function (loc) {
 					_0: _skrypte$elm_hnpwa$Hnpwa$initialFeed,
 					_1: A2(_skrypte$elm_hnpwa$Hnpwa$delayPage, 100, _skrypte$elm_hnpwa$Hnpwa$Top)
 				};
+			case 'Offline':
+				return {ctor: '_Tuple2', _0: _skrypte$elm_hnpwa$Hnpwa$offlineFeed, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'Top':
 				return {
 					ctor: '_Tuple2',
