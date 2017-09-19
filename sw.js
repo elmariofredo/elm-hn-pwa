@@ -15,20 +15,13 @@
  * */
 
 
-var SHELL = "hn-shell";
+var DATA = "elm-hn-pwa";
 
-var DATA = "hn-items";
+//var DATA = "hn-items";
 
-var STORIES = "hn-stories";
+//var STORIES = "hn-stories";
 
 var now = Date.now;
-
-var inCache = [
-    "/"
-    , "/index.html"
-    , "/hn.svg"
-    , "/off"
-];
 
 var api = "https://hacker-news.firebaseio.com/";
 
@@ -40,6 +33,21 @@ var timeout = 800;
 
 var maxItems = 30;
 
+var hn = ["/top", "/new", "/show", "/ask", "/job"];
+
+var stories = [
+    api + versioning + hn[0] + "stories.json"
+    , api + versioning + hn[1] + "stories.json"
+    , api + versioning + hn[2] + "stories.json"
+    , api + versioning + hn[3] + "stories.json"
+    , api + versioning + hn[4] + "stories.json"
+]
+
+var shell = [
+    "/"
+    , "/index.html"
+    , "/hn.svg"
+];
 
 
 /* FUNCTIONS
@@ -61,9 +69,18 @@ function jsonify(response) {
 }
 
 
+function R(json){
+    var h = {"Content-Type": "application/json"};
+
+    return new Response(json, { headers : h, status: 200 });
+}
+
+
 // get item from cache
 // elsewise from network
 function getItem(request){
+
+    var iid = request.url.split("/").reverse().shift().split(".").shift();
 
     return self.caches.open(DATA).then(
         function (cache) {
@@ -71,7 +88,39 @@ function getItem(request){
                 // get json object in cache
                 // or fetch a request if not cached
                 function (jsonCache) {
-                    return jsonCache || putInCache(request);
+
+                    if(jsonCache != undefined && jsonCache.bodyUsed === false){
+                        var item = jsonCache.clone();
+                    }
+
+                    var f = fetch(request).then(
+                        function (i) {
+                            cache.put(request, i.clone());
+                            return i;
+                        }
+                    ).catch(
+                        function () {
+                            if (item != undefined) {
+                                var j = item.clone().json();
+                            }
+
+                            else {
+                                // ;) GITS
+                                var haydali = {
+                                    time : Math.ceil(Date.now() / 1000)
+                                    , by : "skingrapher"
+                                    , title : "<span class='warning'>WARNING: entry "+iid+" will be updated after going back online</span>"
+                                    , id : 2501
+                                    , type: "story"
+                                };
+
+                                var j = JSON.stringify(haydali);
+                            }
+                            return R(j);
+                        }
+                    )
+
+                    return jsonCache || f;
                 }
             );
         }
@@ -81,109 +130,40 @@ function getItem(request){
 
 function getStories(request) {
 
-    var p = new Promise(
-        function (listOf, nothing) {
-            // fetch async request
-            return fetch(request).then(
-                // if response
-                function (ids) {
-                    return self.caches.open(STORIES).then(
-                        // put in cache for next use
-                        function (cache) {
-                            return cache.put(request, ids.clone()).then(
-                                listOf(ids)
-                            );
-                        }
-                    );
-                }
-                // elsewise nothing
-                , nothing
-            );
-        }
-    );
-
-    var cached = self.caches.open(STORIES).then(
+    // stale while revalidate
+    // https://jakearchibald.com/2014/offline-cookbook/#stale-while-revalidate
+    var cached = self.caches.open(DATA).then(
         function (cache) {
             return cache.match(request).then(
                 // get json object in cache
                 // or fetch a request if not cached
                 function (jsonCache) {
-                    return jsonCache || p;
-                }
-            ).catch(
-                function () {
-                    return self.caches.open(SHELL).then(
-                        function (c) {
-                            return c.match("/off").then(
-                                function (page) {
-                                    console.log("getting offline...");
-                                    var j = [ 2501 ];
-                                    var r = new Response(JSON.stringify(j), {headers: {"Content-Type": "application/json"}, status: 200});
-                                    return Promise.resolve(r);
 
-                                }
-                            )
+                    if(jsonCache != undefined && jsonCache.bodyUsed === false){
+                        var list = jsonCache.clone();
+                    }
+
+                    // stories cache update 
+                    var fetching = Promise.all(stories.map(s => Promise.resolve(fetch(s).then(function(i){cache.put(s,i.clone());return i})))).then(
+                        function () {
+                            return cache.match(request)
                         }
-                    )
+                    );
+
+                    fetching.catch(
+                        // fallback cache if fetching failed
+                        function () {
+                            return cache.match(request)
+                        }
+                    );
+
+                    return list || fetching;
                 }
             )
         }
     );
 
     return cached;
-}
-
-
-// put result for item page
-// in cache
-// keyed by its url
-// value is a json array
-function putInCache(request) {
-
-    function is2501(req) {
-        if (req.url === endpoint + "2501.json") {
-            return true;
-        }
-        else {
-            return false;
-        }
-    } 
-    
-    if (is2501(request) === false) {
-        return new Promise(
-            function (item, nothing) {
-                return fetch(request).then(
-                    function (response) {
-
-                        return self.caches.open(DATA).then(
-                            function (cache) {
-                                return cache.add(request).then(
-                                    item(response)
-                                );
-                            }
-                        );
-                    }
-
-                    , nothing
-                );
-            }
-        );
-    }
-
-    else {
-        var off = {
-            time : Math.ceil(Date.now() / 1000)
-            , by : "skingrapher"
-            , title : "WARNING: you are offline"
-            , id : 2501
-            , type: "story"
-        };
-
-        return Promise.resolve(
-            new Response(JSON.stringify(off), {headers: {"Content-Type": "application/json"}, status: 200})
-        );
-
-    }
 }
 
 
@@ -195,10 +175,11 @@ self.addEventListener("install", function (e) {
 
     e.waitUntil(
         // put site in cache
-        caches.open(SHELL).then(
+        caches.open(DATA).then(
             function (c) {
                 return c.addAll(
-                    inCache
+                    shell
+                    , stories
                 );
             }
         )
@@ -208,7 +189,7 @@ self.addEventListener("install", function (e) {
                 return self.skipWaiting();
             }
         )
-    );
+    )
 });
 
 
@@ -246,14 +227,6 @@ self.addEventListener("fetch", function (e) {
         e.respondWith(
             getItem(req)
         );
-        /*
-        if (req.url === endpoint + "2501.json") {
-            e.respondWith(
-                function() {
-                }
-            );
-        }
-        */
     }
 
     // stories request
@@ -262,5 +235,4 @@ self.addEventListener("fetch", function (e) {
             getStories(req)
         );
     }
-
 });
