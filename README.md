@@ -7,7 +7,7 @@ Sample of [HNPWA](http://hnpwa.com) built in [Elm](http://elm-lang.org).
 - 100 on [lighthouse](https://hnpwa.skingrapher.com/lighthouse.html)
 - 91 on [webpagetest](https://www.webpagetest.org/result/171001_FR_8824939a649205e4299597bb581bd197/) for a slow 3G connection
 - service worker partially generated with [workbox](https://workboxjs.org) for static files precache
-- partial offline caching of HN data
+- offline caching of HN data
 - no server-side rendering actually
 
 ## Reliable 
