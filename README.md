@@ -46,6 +46,8 @@ CSS file:
 
     elm make Hnpwa.elm --output elm.js 
 
+then js file is minified and its code is incorporated as a part of the script in index.html
+
 ## Resources
  
 - about PWA: see on [Google](https://developers.google.com/web/progressive-web-apps/) for developers
