@@ -27,8 +27,9 @@ Sample of [HNPWA](http://hnpwa.com) built in [Elm](http://elm-lang.org).
 
 ## Resources
 
-- about PWA: see on [Google](https://developers.google.com/web/progressive-web-apps/) for developers.
+- about PWA: see on [Google](https://developers.google.com/web/progressive-web-apps/) for developers
 - elm tutorials for SPA: [client elm](https://github.com/foxdonut/adventures-reactive-web-dev/tree/elm-010-todolist-feature/client-elm) by Fred Daoud, [elm spa example](https://github.com/rtfeldman/elm-spa-example) by Richard Feldman, [elmstagram](https://github.com/bkbooth/Elmstagram) by Ben Booth
+- about service workers API: see on [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
 
 ## Credits
  
