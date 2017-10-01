@@ -16,10 +16,11 @@ Sample of [HNPWA](http://hnpwa.com) built with [Elm](http://elm-lang.org).
 
 ## Responsive
 
-CSS:
+CSS file:
 - built with Sass
 - inspired from [Material Design Lite](https://getmdl.io/components/index.html)
 - less than 3kb
+- inlined in index.html for better performance
 
 ## TODO
 
