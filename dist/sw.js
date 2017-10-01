@@ -29,7 +29,7 @@ w.precache([
   },
   {
     "url": "index.html",
-    "revision": "f60d8902e8f71299c7fb56dbc5c4fa45"
+    "revision": "c2c9bbd7084c7a35f5efd6e07b3e2817"
   },
   {
     "url": "manifest.json",
