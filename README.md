@@ -42,6 +42,10 @@ CSS file:
 - testing background sync
 - pagination with elm
 
+## Build elm.js howto
+
+    elm make Hnpwa.elm --output elm.js 
+
 ## Resources
  
 - about PWA: see on [Google](https://developers.google.com/web/progressive-web-apps/) for developers
