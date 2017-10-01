@@ -4,8 +4,8 @@ Sample of [HNPWA](http://hnpwa.com) built in [Elm](http://elm-lang.org).
 
 ## Progressive
 
-- 100 on [lighthouse](https://hnpwa.skingrapher.com/lighthouse.html)
-- 91 on [webpagetest](https://www.webpagetest.org/result/171001_FR_8824939a649205e4299597bb581bd197/) for a slow 3G connection
+- **100** on [lighthouse](https://hnpwa.skingrapher.com/lighthouse.html)
+- **91** on [webpagetest](https://www.webpagetest.org/result/171001_FR_8824939a649205e4299597bb581bd197/) for a slow 3G connection
 - service worker partially generated with [workbox](https://workboxjs.org) for static files precache
 - offline caching of HN data
 - no server-side rendering actually
@@ -27,7 +27,8 @@ Sample of [HNPWA](http://hnpwa.com) built in [Elm](http://elm-lang.org).
 
 ## Resources
 
-About progressive web apps: see on [Google](https://developers.google.com/web/progressive-web-apps/) for developers.
+- about PWA: see on [Google](https://developers.google.com/web/progressive-web-apps/) for developers.
+- elm tutorials for SPA: [client elm](https://github.com/foxdonut/adventures-reactive-web-dev/tree/elm-010-todolist-feature/client-elm) by Fred Daoud, [elm spa example](https://github.com/rtfeldman/elm-spa-example) by Richard Feldman, [elmstagram](https://github.com/bkbooth/Elmstagram) by Ben Booth
 
 ## Credits
  
