@@ -25,11 +25,11 @@ let q = new workbox.backgroundSync.Queue({
 w.precache([
   {
     "url": "hn.png",
-    "revision": "67ef14f868ced3230d13c5262e26fe1e"
+    "revision": "ba8282d69d144ff6779be9961d466c71"
   },
   {
     "url": "index.html",
-    "revision": "2ca24aaaa0066ab09ff52bdd518ab9ae"
+    "revision": "f60d8902e8f71299c7fb56dbc5c4fa45"
   },
   {
     "url": "manifest.json",
