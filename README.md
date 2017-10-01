@@ -35,8 +35,9 @@ CSS file:
 - pagination with elm
 
 ## Resources
-
+ 
 - about PWA: see on [Google](https://developers.google.com/web/progressive-web-apps/) for developers
+- check [awesome PWA lists](https://github.com/search?utf8=%E2%9C%93&q=awesome+pwa) on github
 - elm tutorials for SPA: [client elm](https://github.com/foxdonut/adventures-reactive-web-dev/tree/elm-010-todolist-feature/client-elm) by Fred Daoud, [elm spa example](https://github.com/rtfeldman/elm-spa-example) by Richard Feldman, [elmstagram](https://github.com/bkbooth/Elmstagram) by Ben Booth
 - about service workers API: see on [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
 
