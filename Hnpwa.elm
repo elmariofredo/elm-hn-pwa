@@ -812,7 +812,7 @@ story feed (posinset, item) =
                         header []
                             [
                             h2 []
-                                [ a [ target "_blank", rel "noopener", href h2url ]
+                                [ a [ target "_blank", rel "noopener noreferrer", href h2url ]
                                     [ text title
                                     ]
                                 , span [ class "source" ]
