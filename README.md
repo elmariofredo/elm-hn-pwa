@@ -11,7 +11,7 @@ Available on [hnpwa.skingrapher.com](https://hnpwa.skingrapher.com)
 - service worker partially generated with [workbox](https://workboxjs.org) for static files precache
 - offline caching of HN data
 - no server-side rendering actually
-
+ 
 ## Reliable 
 
 - interactive under 5 seconds on a Moto 4G over 3G (see webpagetest below)
@@ -19,13 +19,15 @@ Available on [hnpwa.skingrapher.com](https://hnpwa.skingrapher.com)
 ## Responsive
 
 CSS file:
-- built with Sass
+- built with [Sass](https://sass-guidelin.es/)
 - inspired from [Material Design Lite](https://getmdl.io/components/index.html)
 - less than 3kb
 - inlined in index.html for better performance
+- style supported by all devices (smartphones, tablets and larger screens)
 
 ## Accessible
 
+- **94** on lighthouse (see link to report below)
 - valid accessibility according to WCAG 2.0 (level AAA) guidelines
 - new ARIA **feed** role with **aria-posinset** and **aria-setsize** attributes exists in [WAI-ARIA 1.1](https://www.w3.org/TR/wai-aria-1.1/#feed) 
 - no error according to [a11y.css](https://ffoodd.github.io/a11y.css/)
