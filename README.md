@@ -50,10 +50,10 @@ then the js file is minified and its code is incorporated as a part of the scrip
 
 ## Resources
  
-- about PWA: see on [Google](https://developers.google.com/web/progressive-web-apps/) for developers
+- about PWA: read on [Google](https://developers.google.com/web/progressive-web-apps/) page for developers
 - check the [awesome PWA](https://github.com/hemanth/awesome-pwa) list 
 - elm tutorials for SPA: [client elm](https://github.com/foxdonut/adventures-reactive-web-dev/tree/elm-010-todolist-feature/client-elm) by Fred Daoud, [elm spa example](https://github.com/rtfeldman/elm-spa-example) by Richard Feldman, [elmstagram](https://github.com/bkbooth/Elmstagram) by Ben Booth
-- about service workers API: see on [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
+- about service workers API: read on [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
 
 ## Credits
  
