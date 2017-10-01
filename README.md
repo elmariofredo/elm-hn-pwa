@@ -1,5 +1,9 @@
 # Elm Hacker News Progressive Web App
 
+<p align="center">
+  <img width="256" height="256" src="https://github.com/skrypte/elm-hn-pwa/raw/master/dist/ico/hn_256.png">
+</p>
+
 Sample of [HNPWA](http://hnpwa.com) built with [Elm](http://elm-lang.org) using the official [Hacker-News API](https://github.com/HackerNews/API)
 
 Available on [hnpwa.skingrapher.com](https://hnpwa.skingrapher.com)
