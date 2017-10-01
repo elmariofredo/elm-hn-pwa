@@ -6,11 +6,7 @@ DirectoryIndex index.html
 AddType image/svg+xml svg
 
 
-RewriteRule ^top\/?$ /#/top [NE]
-RewriteRule ^new\/?$ /#/new [NE]
-RewriteRule ^show\/?$ /#/show [NE]
-RewriteRule ^ask\/?$ /#/ask [NE]
-RewriteRule ^jobs\/?$ /#/jobs [NE]
+#RewriteRule ^top\/?$ /#/top [NE]
 
 
 RewriteCond %{HTTPS} off
