@@ -1,6 +1,6 @@
 # Elm Hacker News Progressive Web App
 
-Sample of [HNPWA](http://hnpwa.com) built with [Elm](http://elm-lang.org).
+Sample of [HNPWA](http://hnpwa.com) built with [Elm](http://elm-lang.org) on [hnpwa.skingrapher.com](https://hnpwa.skingrapher.com)
 
 ## Progressive
 
