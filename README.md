@@ -16,7 +16,8 @@ Sample of [HNPWA](http://hnpwa.com) built with [Elm](http://elm-lang.org).
 
 ## Responsive
 
-- CSS built with Sass
+CSS:
+- built with Sass
 - inspired from [Material Design Lite](https://getmdl.io/components/index.html)
 - less than 3kb
 
