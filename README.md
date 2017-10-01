@@ -33,6 +33,7 @@ CSS file:
 
 - **94** on lighthouse (see link to report below)
 - valid accessibility according to WCAG 2.0 (level AAA) guidelines
+- contrast level AAA between background and text for all colors
 - new ARIA **feed** role with **aria-posinset** and **aria-setsize** attributes exists in [WAI-ARIA 1.1](https://www.w3.org/TR/wai-aria-1.1/#feed) 
 - no error according to [a11y.css](https://ffoodd.github.io/a11y.css/)
 - added **noopener** and **noreferrer** relations to links to prevent from target="_blank" vulnerability abuse
