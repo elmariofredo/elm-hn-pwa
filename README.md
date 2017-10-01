@@ -22,6 +22,11 @@ CSS file:
 - less than 3kb
 - inlined in index.html for better performance
 
+## Accessible
+
+- valid accessibility according to WCAG 2.0 (level AAA) guidelines
+- new ARIA **feed** role with **aria-posinset** and **aria-setsize** new attributes exists in [WAI-ARIA 1.1](https://www.w3.org/TR/wai-aria-1.1/#feed) 
+
 ## TODO
 
 - testing background sync
