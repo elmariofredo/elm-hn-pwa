@@ -42,7 +42,7 @@ CSS file:
 
 - testing background sync
 - pagination with elm
-- lazy fetching for very extensive number of comments
+- lazy loading for very extensive comments
 
 ## Build elm.js howto
 
