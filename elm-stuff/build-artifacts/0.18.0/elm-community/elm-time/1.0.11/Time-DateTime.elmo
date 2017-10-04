@@ -1,0 +1,555 @@
+var _elm_community$elm_time$Time_DateTime$isValidTime = F4(
+	function (hour, minute, second, millisecond) {
+		return (_elm_lang$core$Native_Utils.cmp(hour, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(hour, 24) < 0) && ((_elm_lang$core$Native_Utils.cmp(minute, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(minute, 60) < 0) && ((_elm_lang$core$Native_Utils.cmp(second, 0) > -1) && ((_elm_lang$core$Native_Utils.cmp(second, 60) < 0) && ((_elm_lang$core$Native_Utils.cmp(millisecond, 0) > -1) && (_elm_lang$core$Native_Utils.cmp(millisecond, 1000) < 0)))))));
+	});
+var _elm_community$elm_time$Time_DateTime$delta = F2(
+	function (_p1, _p0) {
+		var _p2 = _p1;
+		var _p6 = _p2._0;
+		var _p3 = _p0;
+		var _p5 = _p3._0;
+		var _p4 = A2(_elm_community$elm_time$Time_Date$delta, _p6.date, _p5.date);
+		var years = _p4.years;
+		var months = _p4.months;
+		var days = _p4.days;
+		var milliseconds = (days * _elm_community$elm_time$Time_Internal$dayMs) + (_p6.offset - _p5.offset);
+		var hours = (milliseconds / _elm_community$elm_time$Time_Internal$hourMs) | 0;
+		var minutes = (milliseconds / _elm_community$elm_time$Time_Internal$minuteMs) | 0;
+		var seconds = (milliseconds / _elm_community$elm_time$Time_Internal$secondMs) | 0;
+		return {years: years, months: months, days: days, hours: hours, minutes: minutes, seconds: seconds, milliseconds: milliseconds};
+	});
+var _elm_community$elm_time$Time_DateTime$millisecond = function (_p7) {
+	var _p8 = _p7;
+	return A2(
+		_elm_lang$core$Basics_ops['%'],
+		A2(
+			_elm_lang$core$Basics_ops['%'],
+			A2(_elm_lang$core$Basics_ops['%'], _p8._0.offset, _elm_community$elm_time$Time_Internal$hourMs),
+			_elm_community$elm_time$Time_Internal$minuteMs),
+		_elm_community$elm_time$Time_Internal$secondMs);
+};
+var _elm_community$elm_time$Time_DateTime$second = function (_p9) {
+	var _p10 = _p9;
+	return (A2(
+		_elm_lang$core$Basics_ops['%'],
+		A2(_elm_lang$core$Basics_ops['%'], _p10._0.offset, _elm_community$elm_time$Time_Internal$hourMs),
+		_elm_community$elm_time$Time_Internal$minuteMs) / _elm_community$elm_time$Time_Internal$secondMs) | 0;
+};
+var _elm_community$elm_time$Time_DateTime$minute = function (_p11) {
+	var _p12 = _p11;
+	return (A2(_elm_lang$core$Basics_ops['%'], _p12._0.offset, _elm_community$elm_time$Time_Internal$hourMs) / _elm_community$elm_time$Time_Internal$minuteMs) | 0;
+};
+var _elm_community$elm_time$Time_DateTime$hour = function (_p13) {
+	var _p14 = _p13;
+	return (_p14._0.offset / _elm_community$elm_time$Time_Internal$hourMs) | 0;
+};
+var _elm_community$elm_time$Time_DateTime$toTuple = function (_p15) {
+	var _p16 = _p15;
+	var _p18 = _p16;
+	var _p17 = _elm_community$elm_time$Time_Date$toTuple(_p16._0.date);
+	var year = _p17._0;
+	var month = _p17._1;
+	var day = _p17._2;
+	return {
+		ctor: '_Tuple7',
+		_0: year,
+		_1: month,
+		_2: day,
+		_3: _elm_community$elm_time$Time_DateTime$hour(_p18),
+		_4: _elm_community$elm_time$Time_DateTime$minute(_p18),
+		_5: _elm_community$elm_time$Time_DateTime$second(_p18),
+		_6: _elm_community$elm_time$Time_DateTime$millisecond(_p18)
+	};
+};
+var _elm_community$elm_time$Time_DateTime$weekday = function (_p19) {
+	var _p20 = _p19;
+	return _elm_community$elm_time$Time_Date$weekday(_p20._0.date);
+};
+var _elm_community$elm_time$Time_DateTime$day = function (_p21) {
+	var _p22 = _p21;
+	return _elm_community$elm_time$Time_Date$day(_p22._0.date);
+};
+var _elm_community$elm_time$Time_DateTime$month = function (_p23) {
+	var _p24 = _p23;
+	return _elm_community$elm_time$Time_Date$month(_p24._0.date);
+};
+var _elm_community$elm_time$Time_DateTime$year = function (_p25) {
+	var _p26 = _p25;
+	return _elm_community$elm_time$Time_Date$year(_p26._0.date);
+};
+var _elm_community$elm_time$Time_DateTime$toISO8601 = function (time) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		_elm_lang$core$Basics$toString(
+			_elm_community$elm_time$Time_DateTime$year(time)),
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'-',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_community$elm_time$Time_Internal$padded(
+					_elm_community$elm_time$Time_DateTime$month(time)),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'-',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_community$elm_time$Time_Internal$padded(
+							_elm_community$elm_time$Time_DateTime$day(time)),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'T',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_elm_community$elm_time$Time_Internal$padded(
+									_elm_community$elm_time$Time_DateTime$hour(time)),
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									':',
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										_elm_community$elm_time$Time_Internal$padded(
+											_elm_community$elm_time$Time_DateTime$minute(time)),
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											':',
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												_elm_community$elm_time$Time_Internal$padded(
+													_elm_community$elm_time$Time_DateTime$second(time)),
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													'.',
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														_elm_community$elm_time$Time_Internal$padded3(
+															_elm_community$elm_time$Time_DateTime$millisecond(time)),
+														'Z')))))))))))));
+};
+var _elm_community$elm_time$Time_DateTime$compare = F2(
+	function (dt1, dt2) {
+		return A2(
+			_elm_lang$core$Basics$compare,
+			_elm_community$elm_time$Time_DateTime$toISO8601(dt1),
+			_elm_community$elm_time$Time_DateTime$toISO8601(dt2));
+	});
+var _elm_community$elm_time$Time_DateTime$date = function (_p27) {
+	var _p28 = _p27;
+	return _p28._0.date;
+};
+var _elm_community$elm_time$Time_DateTime$zero = _elm_community$elm_time$Time_Internal$zero;
+var _elm_community$elm_time$Time_DateTime$DateTimeDelta = F7(
+	function (a, b, c, d, e, f, g) {
+		return {years: a, months: b, days: c, hours: d, minutes: e, seconds: f, milliseconds: g};
+	});
+var _elm_community$elm_time$Time_DateTime$DateTime = function (a) {
+	return {ctor: 'DateTime', _0: a};
+};
+var _elm_community$elm_time$Time_DateTime$dateTime = function (_p29) {
+	var _p30 = _p29;
+	return _elm_community$elm_time$Time_DateTime$DateTime(
+		{
+			date: A3(_elm_community$elm_time$Time_Date$date, _p30.year, _p30.month, _p30.day),
+			offset: _elm_community$elm_time$Time_Internal$offsetFromTimeData(_p30)
+		});
+};
+var _elm_community$elm_time$Time_DateTime$epoch = _elm_community$elm_time$Time_DateTime$dateTime(
+	_elm_lang$core$Native_Utils.update(
+		_elm_community$elm_time$Time_DateTime$zero,
+		{year: 1970}));
+var _elm_community$elm_time$Time_DateTime$toTimestamp = function (time) {
+	return _elm_lang$core$Basics$toFloat(
+		function (_) {
+			return _.milliseconds;
+		}(
+			A2(_elm_community$elm_time$Time_DateTime$delta, time, _elm_community$elm_time$Time_DateTime$epoch)));
+};
+var _elm_community$elm_time$Time_DateTime$fromTuple = function (_p31) {
+	var _p32 = _p31;
+	return _elm_community$elm_time$Time_DateTime$dateTime(
+		{year: _p32._0, month: _p32._1, day: _p32._2, hour: _p32._3, minute: _p32._4, second: _p32._5, millisecond: _p32._6});
+};
+var _elm_community$elm_time$Time_DateTime$mkDateTime = F2(
+	function (date, time) {
+		return _elm_community$elm_time$Time_DateTime$DateTime(
+			{
+				date: date,
+				offset: _elm_community$elm_time$Time_Internal$offsetFromTimeData(time)
+			});
+	});
+var _elm_community$elm_time$Time_DateTime$setHour = F2(
+	function (hour, _p33) {
+		var _p34 = _p33;
+		var _p35 = _p34;
+		return A2(
+			_elm_community$elm_time$Time_DateTime$mkDateTime,
+			_p34._0.date,
+			{
+				hour: hour,
+				minute: _elm_community$elm_time$Time_DateTime$minute(_p35),
+				second: _elm_community$elm_time$Time_DateTime$second(_p35),
+				millisecond: _elm_community$elm_time$Time_DateTime$millisecond(_p35)
+			});
+	});
+var _elm_community$elm_time$Time_DateTime$setMinute = F2(
+	function (minute, _p36) {
+		var _p37 = _p36;
+		var _p38 = _p37;
+		return A2(
+			_elm_community$elm_time$Time_DateTime$mkDateTime,
+			_p37._0.date,
+			{
+				hour: _elm_community$elm_time$Time_DateTime$hour(_p38),
+				minute: minute,
+				second: _elm_community$elm_time$Time_DateTime$second(_p38),
+				millisecond: _elm_community$elm_time$Time_DateTime$millisecond(_p38)
+			});
+	});
+var _elm_community$elm_time$Time_DateTime$setSecond = F2(
+	function (second, _p39) {
+		var _p40 = _p39;
+		var _p41 = _p40;
+		return A2(
+			_elm_community$elm_time$Time_DateTime$mkDateTime,
+			_p40._0.date,
+			{
+				hour: _elm_community$elm_time$Time_DateTime$hour(_p41),
+				minute: _elm_community$elm_time$Time_DateTime$minute(_p41),
+				second: second,
+				millisecond: _elm_community$elm_time$Time_DateTime$millisecond(_p41)
+			});
+	});
+var _elm_community$elm_time$Time_DateTime$setMillisecond = F2(
+	function (millisecond, _p42) {
+		var _p43 = _p42;
+		var _p44 = _p43;
+		return A2(
+			_elm_community$elm_time$Time_DateTime$mkDateTime,
+			_p43._0.date,
+			{
+				hour: _elm_community$elm_time$Time_DateTime$hour(_p44),
+				minute: _elm_community$elm_time$Time_DateTime$minute(_p44),
+				second: _elm_community$elm_time$Time_DateTime$second(_p44),
+				millisecond: millisecond
+			});
+	});
+var _elm_community$elm_time$Time_DateTime$setDate = F2(
+	function (date, _p45) {
+		var _p46 = _p45;
+		return _elm_community$elm_time$Time_DateTime$DateTime(
+			{date: date, offset: _p46._0.offset});
+	});
+var _elm_community$elm_time$Time_DateTime$setYear = F2(
+	function (year, _p47) {
+		var _p48 = _p47;
+		return _elm_community$elm_time$Time_DateTime$DateTime(
+			{
+				date: A2(_elm_community$elm_time$Time_Date$setYear, year, _p48._0.date),
+				offset: _p48._0.offset
+			});
+	});
+var _elm_community$elm_time$Time_DateTime$setMonth = F2(
+	function (month, _p49) {
+		var _p50 = _p49;
+		return _elm_community$elm_time$Time_DateTime$DateTime(
+			{
+				date: A2(_elm_community$elm_time$Time_Date$setMonth, month, _p50._0.date),
+				offset: _p50._0.offset
+			});
+	});
+var _elm_community$elm_time$Time_DateTime$setDay = F2(
+	function (day, _p51) {
+		var _p52 = _p51;
+		return _elm_community$elm_time$Time_DateTime$DateTime(
+			{
+				date: A2(_elm_community$elm_time$Time_Date$setDay, day, _p52._0.date),
+				offset: _p52._0.offset
+			});
+	});
+var _elm_community$elm_time$Time_DateTime$addYears = F2(
+	function (years, _p53) {
+		var _p54 = _p53;
+		return _elm_community$elm_time$Time_DateTime$DateTime(
+			{
+				date: A2(_elm_community$elm_time$Time_Date$addYears, years, _p54._0.date),
+				offset: _p54._0.offset
+			});
+	});
+var _elm_community$elm_time$Time_DateTime$addMonths = F2(
+	function (months, _p55) {
+		var _p56 = _p55;
+		return _elm_community$elm_time$Time_DateTime$DateTime(
+			{
+				date: A2(_elm_community$elm_time$Time_Date$addMonths, months, _p56._0.date),
+				offset: _p56._0.offset
+			});
+	});
+var _elm_community$elm_time$Time_DateTime$addDays = F2(
+	function (days, _p57) {
+		var _p58 = _p57;
+		return _elm_community$elm_time$Time_DateTime$DateTime(
+			{
+				date: A2(_elm_community$elm_time$Time_Date$addDays, days, _p58._0.date),
+				offset: _p58._0.offset
+			});
+	});
+var _elm_community$elm_time$Time_DateTime$addMilliseconds = F2(
+	function (ms, _p59) {
+		var _p60 = _p59;
+		var total = ms + _p60._0.offset;
+		var _p61 = function () {
+			if (_elm_lang$core$Native_Utils.cmp(total, 0) < 0) {
+				var offset = A2(_elm_lang$core$Basics$rem, total, _elm_community$elm_time$Time_Internal$dayMs);
+				var days = 0 - (((_elm_lang$core$Basics$abs(total) / _elm_community$elm_time$Time_Internal$dayMs) | 0) + 1);
+				return _elm_lang$core$Native_Utils.eq(offset, 0) ? {ctor: '_Tuple2', _0: days + 1, _1: 0} : {
+					ctor: '_Tuple2',
+					_0: days,
+					_1: _elm_community$elm_time$Time_Internal$dayMs + A2(_elm_lang$core$Basics$rem, offset, _elm_community$elm_time$Time_Internal$dayMs)
+				};
+			} else {
+				return {
+					ctor: '_Tuple2',
+					_0: (total / _elm_community$elm_time$Time_Internal$dayMs) | 0,
+					_1: A2(_elm_lang$core$Basics$rem, total, _elm_community$elm_time$Time_Internal$dayMs)
+				};
+			}
+		}();
+		var days = _p61._0;
+		var newOffset = _p61._1;
+		return _elm_community$elm_time$Time_DateTime$DateTime(
+			{
+				date: A2(_elm_community$elm_time$Time_Date$addDays, days, _p60._0.date),
+				offset: newOffset
+			});
+	});
+var _elm_community$elm_time$Time_DateTime$addHours = F2(
+	function (hours, time) {
+		return A2(_elm_community$elm_time$Time_DateTime$addMilliseconds, hours * _elm_community$elm_time$Time_Internal$hourMs, time);
+	});
+var _elm_community$elm_time$Time_DateTime$addMinutes = F2(
+	function (minutes, time) {
+		return A2(_elm_community$elm_time$Time_DateTime$addMilliseconds, minutes * _elm_community$elm_time$Time_Internal$minuteMs, time);
+	});
+var _elm_community$elm_time$Time_DateTime$fromISO8601 = function (input) {
+	var convert = function (_p62) {
+		var _p63 = _p62;
+		var _p69 = _p63._0._0;
+		var _p68 = _p63._1._2;
+		var _p67 = _p63._0._1;
+		var _p66 = _p63._1._1;
+		var _p65 = _p63._1._0;
+		var _p64 = _p63._0._2;
+		return (A3(_elm_community$elm_time$Time_Date$isValidDate, _p69, _p67, _p64) && A4(_elm_community$elm_time$Time_DateTime$isValidTime, _p65, _p66, _p68, 0)) ? _elm_community$parser_combinators$Combine$succeed(
+			A2(
+				_elm_community$elm_time$Time_DateTime$addMinutes,
+				0 - _p63._2,
+				_elm_community$elm_time$Time_DateTime$dateTime(
+					A7(_elm_community$elm_time$Time_Internal$DateTimeData, _p69, _p67, _p64, _p65, _p66, _p68, _p63._1._3)))) : _elm_community$parser_combinators$Combine$fail('invalid date');
+	};
+	var offset = A2(
+		_elm_community$parser_combinators$Combine_ops['<|>'],
+		A2(
+			_elm_community$parser_combinators$Combine_ops['<$'],
+			0,
+			_elm_community$parser_combinators$Combine$string('Z')),
+		A2(
+			_elm_community$parser_combinators$Combine_ops['<*>'],
+			A2(
+				_elm_community$parser_combinators$Combine_ops['<*>'],
+				A2(
+					_elm_community$parser_combinators$Combine_ops['<$>'],
+					F3(
+						function (s, h, m) {
+							return ((s * h) * 60) + (s * m);
+						}),
+					_elm_community$parser_combinators$Combine$choice(
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_community$parser_combinators$Combine_ops['<$'],
+								1,
+								_elm_community$parser_combinators$Combine$string('+')),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_community$parser_combinators$Combine_ops['<$'],
+									-1,
+									_elm_community$parser_combinators$Combine$string('-')),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_community$parser_combinators$Combine_ops['<$'],
+										-1,
+										_elm_community$parser_combinators$Combine$string('−')),
+									_1: {ctor: '[]'}
+								}
+							}
+						})),
+				A3(_elm_community$elm_time$Time_Internal$digitsInRange, 2, 0, 23)),
+			A2(
+				_elm_community$parser_combinators$Combine_ops['*>'],
+				A2(
+					_elm_community$parser_combinators$Combine$optional,
+					':',
+					_elm_community$parser_combinators$Combine$string(':')),
+				A3(_elm_community$elm_time$Time_Internal$digitsInRange, 2, 0, 59))));
+	var basicDate = A2(
+		_elm_community$parser_combinators$Combine_ops['<*>'],
+		A2(
+			_elm_community$parser_combinators$Combine_ops['<*>'],
+			A2(
+				_elm_community$parser_combinators$Combine_ops['<$>'],
+				F3(
+					function (v0, v1, v2) {
+						return {ctor: '_Tuple3', _0: v0, _1: v1, _2: v2};
+					}),
+				A3(_elm_community$elm_time$Time_Internal$digitsInRange, 4, 0, 9999)),
+			A3(_elm_community$elm_time$Time_Internal$digitsInRange, 2, 1, 12)),
+		A3(_elm_community$elm_time$Time_Internal$digitsInRange, 2, 1, 31));
+	var extendedDate = A2(
+		_elm_community$parser_combinators$Combine_ops['<*>'],
+		A2(
+			_elm_community$parser_combinators$Combine_ops['<*>'],
+			A2(
+				_elm_community$parser_combinators$Combine_ops['<$>'],
+				F3(
+					function (v0, v1, v2) {
+						return {ctor: '_Tuple3', _0: v0, _1: v1, _2: v2};
+					}),
+				_elm_community$parser_combinators$Combine_Num$int),
+			A2(
+				_elm_community$parser_combinators$Combine_ops['*>'],
+				_elm_community$parser_combinators$Combine$string('-'),
+				A2(_elm_community$elm_time$Time_Internal$intRange, 1, 12))),
+		A2(
+			_elm_community$parser_combinators$Combine_ops['*>'],
+			_elm_community$parser_combinators$Combine$string('-'),
+			A2(_elm_community$elm_time$Time_Internal$intRange, 1, 31)));
+	var fraction = function () {
+		var parseInteger = function (s) {
+			var _p70 = _elm_lang$core$String$toInt(s);
+			if (_p70.ctor === 'Err') {
+				return 0;
+			} else {
+				return _p70._0;
+			}
+		};
+		var keepUpTo3Places = function (fractionString) {
+			var denominator = Math.pow(
+				10,
+				_elm_lang$core$String$length(fractionString));
+			var numerator = parseInteger(fractionString);
+			return _elm_lang$core$Basics$round(
+				(_elm_community$elm_time$Time_Internal$secondMs * _elm_lang$core$Basics$toFloat(numerator)) / _elm_lang$core$Basics$toFloat(denominator));
+		};
+		var convert = function (fractionString) {
+			return keepUpTo3Places(fractionString);
+		};
+		var getFractionString = A2(
+			_elm_community$parser_combinators$Combine_ops['<$>'],
+			function (p) {
+				return p;
+			},
+			_elm_community$parser_combinators$Combine$regex('\\d*'));
+		return A2(_elm_community$parser_combinators$Combine_ops['<$>'], convert, getFractionString);
+	}();
+	var extendedTime = A2(
+		_elm_community$parser_combinators$Combine_ops['<*>'],
+		A2(
+			_elm_community$parser_combinators$Combine_ops['<*>'],
+			A2(
+				_elm_community$parser_combinators$Combine_ops['<*>'],
+				A2(
+					_elm_community$parser_combinators$Combine_ops['<$>'],
+					F4(
+						function (v0, v1, v2, v3) {
+							return {ctor: '_Tuple4', _0: v0, _1: v1, _2: v2, _3: v3};
+						}),
+					A2(
+						_elm_community$parser_combinators$Combine_ops['*>'],
+						_elm_community$parser_combinators$Combine$string('T'),
+						A2(_elm_community$elm_time$Time_Internal$intRange, 0, 23))),
+				A2(
+					_elm_community$parser_combinators$Combine_ops['*>'],
+					_elm_community$parser_combinators$Combine$string(':'),
+					A2(_elm_community$elm_time$Time_Internal$intRange, 0, 59))),
+			A2(
+				_elm_community$parser_combinators$Combine_ops['*>'],
+				_elm_community$parser_combinators$Combine$string(':'),
+				A2(_elm_community$elm_time$Time_Internal$intRange, 0, 59))),
+		A2(
+			_elm_community$parser_combinators$Combine$optional,
+			0,
+			A2(
+				_elm_community$parser_combinators$Combine_ops['*>'],
+				_elm_community$parser_combinators$Combine$regex('[,.]'),
+				fraction)));
+	var basicTime = A2(
+		_elm_community$parser_combinators$Combine_ops['<*>'],
+		A2(
+			_elm_community$parser_combinators$Combine_ops['<*>'],
+			A2(
+				_elm_community$parser_combinators$Combine_ops['<*>'],
+				A2(
+					_elm_community$parser_combinators$Combine_ops['<$>'],
+					F4(
+						function (v0, v1, v2, v3) {
+							return {ctor: '_Tuple4', _0: v0, _1: v1, _2: v2, _3: v3};
+						}),
+					A2(
+						_elm_community$parser_combinators$Combine_ops['*>'],
+						_elm_community$parser_combinators$Combine$string('T'),
+						A3(_elm_community$elm_time$Time_Internal$digitsInRange, 2, 0, 23))),
+				A3(_elm_community$elm_time$Time_Internal$digitsInRange, 2, 0, 59)),
+			A3(_elm_community$elm_time$Time_Internal$digitsInRange, 2, 0, 59)),
+		A2(
+			_elm_community$parser_combinators$Combine$optional,
+			0,
+			A2(
+				_elm_community$parser_combinators$Combine_ops['*>'],
+				_elm_community$parser_combinators$Combine$regex('[,.]'),
+				fraction)));
+	var datetime = A2(
+		_elm_community$parser_combinators$Combine_ops['<*'],
+		A2(
+			_elm_community$parser_combinators$Combine_ops['<*>'],
+			A2(
+				_elm_community$parser_combinators$Combine_ops['<*>'],
+				A2(
+					_elm_community$parser_combinators$Combine_ops['<$>'],
+					F3(
+						function (v0, v1, v2) {
+							return {ctor: '_Tuple3', _0: v0, _1: v1, _2: v2};
+						}),
+					A2(_elm_community$parser_combinators$Combine_ops['<|>'], extendedDate, basicDate)),
+				A2(_elm_community$parser_combinators$Combine_ops['<|>'], extendedTime, basicTime)),
+			offset),
+		_elm_community$parser_combinators$Combine$end);
+	var _p71 = A2(
+		_elm_community$parser_combinators$Combine$parse,
+		A2(_elm_community$parser_combinators$Combine_ops['>>='], datetime, convert),
+		input);
+	if (_p71.ctor === 'Ok') {
+		return _elm_lang$core$Result$Ok(_p71._0._2);
+	} else {
+		var messages = A2(_elm_lang$core$String$join, ' or ', _p71._0._2);
+		return _elm_lang$core$Result$Err(
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'Errors encountered at position ',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(_p71._0._1.position),
+					A2(_elm_lang$core$Basics_ops['++'], ': ', messages))));
+	}
+};
+var _elm_community$elm_time$Time_DateTime$addSeconds = F2(
+	function (seconds, time) {
+		return A2(_elm_community$elm_time$Time_DateTime$addMilliseconds, seconds * _elm_community$elm_time$Time_Internal$secondMs, time);
+	});
+var _elm_community$elm_time$Time_DateTime$fromTimestamp = function (timestamp) {
+	return A2(
+		_elm_community$elm_time$Time_DateTime$addMilliseconds,
+		_elm_lang$core$Basics$round(timestamp),
+		_elm_community$elm_time$Time_DateTime$epoch);
+};
