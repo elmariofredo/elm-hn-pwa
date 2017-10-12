@@ -415,3 +415,44 @@ h4
   display: none
   visibility: hidden
 
+#pagination
+  display: flex
+  justify-content: center
+  align-items: center
+  background: transparent 
+  padding: 10px 0
+
+button
+  border-radius: 50%
+  width: 36px
+  height: 36px
+  outline: none
+  margin: 0 5px
+  display: inline-block
+  border: none
+  background: $gray 
+  background-image: linear-gradient(-45deg, $gray, $darkgray)
+  color: $color 
+  cursor: pointer
+  transition: box-shadow .2s, transform .2s, color .2s
+  box-shadow: 0 3px 0 0 $shadow, 0 4px 4px -1px hsla(151, 57%, 22%, .6), 0 4px 6px 1px hsla(151, 57%, 22%, .3), 0 1px 2px 1px transparent inset, 0 18px 32px -2px white inset
+
+  &:hover
+    box-shadow: 0 2px 12px rgba(0, 0%, 0%, .5)
+    box-shadow: 0 3px 0 0 $shadow, 0 6px 4px -1px hsla(151, 57%, 22%, .3), 0 4px 16px hsla(151, 57%, 22%, .5), 0 1px 2px 1px transparent inset, 0 18px 32px -2px hsla(0, 0%, 98%, .14) inset
+
+  &:active
+    box-shadow: 0 0px 0 0 #a8b6c7, 0 3px 0 0 transparent, 0 4px 16px transparent, 0 1px 2px 1px hsla(151, 57%, 22%, .5) inset, 0 -18px 32px -2px white inset
+    transform: translateY(3px)
+    transition: 0s
+    color: $shadow
+    text-shadow: 0 1px 0 rgba(250, 250, 250, .3)
+
+  &:disabled
+    cursor: not-allowed
+    opacity: .6
+
+strong
+  padding: 0 10px
+  font-weight: 700
+
