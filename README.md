@@ -19,6 +19,8 @@ Available on [hnpwa.skingrapher.com](https://hnpwa.skingrapher.com)
 ## Reliable 
 
 - interactive under 5 seconds on a Moto 4G over 3G (see webpagetest below)
+- first interactive (emerging markets): 2.4s
+- first interactive (faster 3G): 1.7s
 
 ## Responsive
 
