@@ -25,17 +25,18 @@ Available on [hnpwa.skingrapher.com](https://hnpwa.skingrapher.com)
 CSS file:
 - built with [Sass](https://sass-guidelin.es/)
 - inspired from [Material Design Lite](https://getmdl.io/components/index.html)
-- less than 3kb
+- less than 4kb
 - inlined in index.html for better performance
 - style supported by all devices (smartphones, tablets and larger screens)
 
 ## Accessible
 
-- **94** on lighthouse (see link to report below)
+- **100** on lighthouse (see link to report below)
 - valid accessibility according to WCAG 2.0 (level AAA) guidelines
 - contrast level AAA between background and text for all colors
 - new ARIA **feed** role with **aria-posinset** and **aria-setsize** attributes exists in [WAI-ARIA 1.1](https://www.w3.org/TR/wai-aria-1.1/#feed) 
 - no error according to [a11y.css](https://ffoodd.github.io/a11y.css/)
+- no bitmap pictures
 - added **noopener** and **noreferrer** relations to links to prevent from target="_blank" vulnerability abuse
 
 ## TODO
@@ -60,5 +61,5 @@ then the js file is minified and its code is incorporated as a part of the scrip
 ## Credits
  
 - github icon from [Entypo](https://entypo.com)
-- elm SVG logo [here](https://upload.wikimedia.org/wikipedia/commons/f/f3/Elm_logo.svg)
+- original elm SVG logo [here](https://upload.wikimedia.org/wikipedia/commons/f/f3/Elm_logo.svg)
 - SVG loader by [Sam Herbert](http://samherbert.net/svg-loaders/)
