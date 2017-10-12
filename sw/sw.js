@@ -12,6 +12,8 @@ let stories = ["top", "new", "show", "ask", "job" ].map(str => {
     return endpoint + "stories.json"
 });
 
+let maxItemsPerPage = 30;
+
 const w = new self.WorkboxSW({
     cacheId : "hn"
     , skipWaiting: true
@@ -23,34 +25,7 @@ let q = new workbox.backgroundSync.Queue({
 });
 
 w.precache([]);
-/*
-let api = "https://hacker-news\.firebaseio\.com/";
 
-let q = new workbox.backgroundSync.QueuePlugin({
-    queueName: "hn-sync"
-});
-
-let url = new RegExp("^" + api + versioning + "/(item/\\d+|(top|new|show|ask|job)stories)\.json$"); 
-
-const d = w.strategies.staleWhileRevalidate({
-    cacheName: DATA 
-    , cacheableResponse: {statuses: [0, 200]}
-    , headers: {"Content-Type": "application/json"}
-    , plugins: [q]
-});
-
-
-w.router.registerRoute(
-    url
-    , params => {return d.handle(params)}
-);
-w.router.registerNavigationRoute(
-    "/index.html"
-    , {
-        whitelist: [/#\/(top|new|show|ask|jobs|off)/]
-    }
-);
-*/
 
 /* FUNCTIONS
  * */
@@ -70,25 +45,25 @@ function getItem(request){
     var iid = request.url.split("/").reverse().shift().split(".").shift();
 
     return self.caches.open(DATA).then(
-        function (cache) {
+        cache => {
             return cache.match(request).then(
                 // get json object in cache
                 // or fetch a request if not cached
-                function (jsonCache) {
+                jsonCache => {
 
                     if(jsonCache != undefined && jsonCache.bodyUsed === false){
                         var item = jsonCache.clone();
                     }
 
                     var f = fetch(request).then(
-                        function (i) {
+                        i => {
                             if(i.ok === true){
                                 cache.put(request, i.clone());
                                 return i;
                             }
                         }
                     ).catch(
-                        function () {
+                        () => {
                             if (item != undefined) {
                                 var j = item.clone().json();
                             }
@@ -139,18 +114,18 @@ function getStories(request) {
                             stories.map(
                                 s => {
                                     return fetch(s).then(
-                                        function(i){
+                                        i => {
                                             if(i.ok === true){
                                                 cache.put(s,i.clone());
                                                 return i
                                             }
                                         }
-                    )})).then(function () {return cache.match(request)})
+                    )})).then(() => {return cache.match(request)})
                     ;
 
                     fetching.catch(
                         // fallback cache if fetching failed
-                        function () {
+                        () => {
                             // push into queue for sync
                             // https://workboxjs.org/reference-docs/latest/module-workbox-background-sync.Queue.html
                             q.pushIntoQueue({request: reqClone});
@@ -173,7 +148,7 @@ function getStories(request) {
  * */
 
 
-self.addEventListener("install", function (e) {
+self.addEventListener("install", e => {
 
     e.waitUntil(
         // put site in cache
@@ -190,6 +165,7 @@ self.addEventListener("install", function (e) {
     )
 });
 
+
 /* SW FETCH DATA
  * */
 
@@ -204,11 +180,13 @@ self.addEventListener("fetch", function (e) {
     var str = "stories";
     var isStoriesUrl = url.pathname.match(str);
 
+/*
     if (e.request.mode === "navigate") {
         e.respondWith(
             fetch(e.request).catch(fetch("/#/off"))
         )
     }
+*/
 
     // item request
     if (isItemUrl != null) {
