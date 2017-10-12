@@ -2,42 +2,63 @@
 ************+
 ELM HN PWA
 *************
-VERSION: 0.11
+VERSION: 0.12
 =============
 TODO:
 - pagination
-- make progressive
+- lazy fetching for very long number of comments
 --}
 
 
 module Hnpwa exposing (..)
 
+-- core modules
+import String exposing (isEmpty, split, concat, join)
+import Maybe exposing (withDefault)
+import Result as R
+import Process exposing (sleep)
+import Task exposing (Task, sequence)
+
+-- json decode modules
 import Json.Decode as JD exposing (Decoder, int, string, list, lazy)
 import Json.Decode.Pipeline exposing (optional, required, decode)
-import String exposing (isEmpty, split, concat, join)
+
+-- list, dict, array
 import List exposing (take, drop, singleton, indexedMap, length, append, head, unzip, partition)
 import Dict exposing (Dict, empty, insert)
 import Array as A
-import Process exposing (sleep)
+
+-- svg
 import Svg as G exposing (rect, path, desc, svg, g, animate, circle)
 import Svg.Attributes exposing (d, fill, x, y, width, height, viewBox, cx, cy, r, attributeName, begin, dur, values, calcMode, keyTimes, keySplines, repeatCount, stroke, strokeWidth)
-import Html exposing (Html, Attribute, node, article, main_, nav, section, header, footer, a, br, div, figure, h1, h2, h3, h4, li, object, p, span, text, time, ul)
-import Html.Attributes exposing (id, class, href, target, rel, datetime, src, alt, attribute, tabindex, title, type_)
+
+-- html
+import Html exposing (Html, Attribute, node, article, main_, nav, section, header, footer, a, br, button, div, figure, h1, h2, h3, h4, li, object, p, span, strong, text, time, ul)
+import Html.Attributes exposing (id, class, href, target, rel, datetime, src, alt, attribute, tabindex, title, type_, disabled)
+import Html.Events exposing (onClick)
 import Html.Keyed as K
 import Html.Lazy as Lz
 import HtmlParser exposing (parse)
 import HtmlParser.Util exposing (toVirtualDom)
+
+-- http
 import Http exposing (Header) 
-import Task exposing (Task, sequence)
-import Maybe exposing (withDefault)
-import Result as R
+
+-- remote data
 import RemoteData as RD exposing (RemoteData(..), WebData)
 import RemoteData.Http exposing (get, Config, getTaskWithConfig)
+
+-- navigation
 import Navigation exposing (Location)
 import UrlParser as Url exposing (Parser, oneOf, s, parseHash, (</>))
+
+-- time and date
 import Time exposing (Time, inSeconds, inMinutes, inHours, inMilliseconds, second)
 import Date exposing (Date, fromTime, day, month, year)
 import Time.DateTime exposing (fromTimestamp, toISO8601)
+
+-- pagination
+import Paginate as P exposing (PaginatedList, next, prev, first, last, isFirst, isLast, totalPages, currentPage)
 
 
 {--
@@ -210,12 +231,14 @@ type alias Feed =
     , comments : Items 
     , index :
         Dict Int (List Item) 
+        -- comments are indexed to their parent item
+    , ids : WebData (PaginatedList Int)
     }
 
 
 initialFeed : Feed
 initialFeed =
-    { data = NotAsked, page = Blank, now = 0, comments = NotAsked, index = empty }
+    { data = NotAsked, page = Blank, now = 0, comments = NotAsked, index = empty, ids = NotAsked  }
 
 
 
@@ -584,6 +607,7 @@ page feed =
 
                 Success items ->
                     case feed.page of
+                        -- item page
                         SingleItem id ->
                             let
                                 unique : Maybe Item
@@ -609,12 +633,52 @@ page feed =
                                             |> comments
                                             |> Lz.lazy (K.node "div" [ class "feed", attribute "aria-busy" "false", attribute "role" "feed" ])
                                         ]
+                        -- stories page
                         _ ->
-                            main_ []
-                                [ List.filter (\i -> i.type_ /= "comment") items
-                                    |> stories 
-                                    |> Lz.lazy (K.node "div" [ class "feed", attribute "aria-busy" "false", attribute "role" "feed" ])
-                                ]
+                            let
+                                p: PaginatedList Int 
+                                p =
+                                    case feed.ids of
+                                        Success paginated ->
+                                            paginated
+                                        _ ->
+                                            P.fromList 0 nolist 
+
+                                isFirstPage: Bool
+                                isFirstPage = 
+                                    case feed.ids of
+                                        Success paginated ->
+                                            if P.isFirst paginated == True then
+                                                True
+                                            else
+                                                False
+                                        _ ->
+                                            False
+
+                                isLastPage: Bool
+                                isLastPage = 
+                                    case feed.ids of
+                                        Success paginated ->
+                                            if P.isLast paginated == True then
+                                                True
+                                            else
+                                                False
+                                        _ ->
+                                            False
+
+                            in
+                                main_ []
+                                    [ nav [ id "pagination" ]
+                                        [ button [ onClick <| Go First, title "first page", disabled isFirstPage ] [ text "<<" ]
+                                        , button [ onClick <| Go Prev, title "previous page", disabled isFirstPage ] [ text "<" ]
+                                        , strong [] [ text <| toString (currentPage p) ++ "/" ++ toString (totalPages p) ]
+                                        , button [ onClick <| Go Next, title "next page", disabled isLastPage ] [ text ">" ]
+                                        , button [ onClick <| Go Last, title "last page", disabled isLastPage ] [ text ">>" ]
+                                        ]
+                                    , List.filter (\i -> i.type_ /= "comment") items
+                                        |> stories 
+                                        |> Lz.lazy (K.node "div" [ class "feed", attribute "aria-busy" "false", attribute "role" "feed" ])
+                                    ]
 
                 Failure err ->
                     p [ id "err" ]
@@ -894,6 +958,7 @@ type Data
     | ChainItems (Time, Items)
     | ChainComments (Time, Int, Items)
     | From (Maybe Page)
+    | Go To
 
 type alias Items =
     WebData (List Item)
@@ -1043,8 +1108,11 @@ getItems ids =
                 getitem id =
                     getTaskWithConfig requestConf (itemurl id) (laz item)
             in
-                List.take maxItemsPerPage itemIds
-                    |> List.map getitem
+                ----OLD v0.11
+                --List.take maxItemsPerPage itemIds
+                    --|> List.map getitem
+                ----OLD
+                List.map getitem itemIds
                     |> sequence
                     |> enlist
 
@@ -1194,7 +1262,20 @@ update data feed =
     in
         case data of
             FetchStories ids ->
-                ( { feed | data = Loading }, getItems ids )
+                let
+                    -- on first page
+                    pagedIds : RemoteData Http.Error (PaginatedList Int) 
+                    pagedIds = RD.map (P.fromList maxItemsPerPage) ids
+
+                    -- convert paginated list to normal list
+                    listedIds : RemoteData Http.Error (List Int) 
+                    listedIds = RD.map P.page pagedIds
+
+                in
+                    ----OLD v0.11
+                    --( { feed | data = Loading }, getItems ids )
+                    ----OLD
+                    ( { feed | data = Loading, ids = pagedIds }, getItems listedIds )
 
             FetchSingleItem (t, item) ->
                 ( { feed | data = item, now = t }, getKidsOfSeveral item )
@@ -1210,6 +1291,28 @@ update data feed =
 
             From (Just page) ->
                 ( { feed | page = page, comments = NotAsked, index = empty }, getPage page )
+
+            Go to ->
+                let
+                    ids : RemoteData Http.Error (PaginatedList Int)
+                    ids = feed.ids
+
+                    newPage : RemoteData Http.Error (PaginatedList Int)
+                    newPage =
+                        case to of
+                            Next -> 
+                                RD.map next ids 
+                            Prev -> 
+                                RD.map prev ids 
+                            First -> 
+                                RD.map first ids 
+                            Last -> 
+                                RD.map last ids 
+
+                    listedIds : RemoteData Http.Error (List Int) 
+                    listedIds = RD.map P.page newPage 
+                in
+                    ( { feed | ids = newPage }, getItems listedIds )
 
             From Nothing ->
                 feed ! [ Cmd.none ]
@@ -1286,6 +1389,20 @@ pathto loc =
 pathparser : Location -> Data
 pathparser loc =
     From <| parseHash route loc
+
+
+
+{-- ***********************************
+ P A G I N A T I O N
+***************************************
+--}
+
+
+type To =
+    Next
+    | Prev
+    | First
+    | Last
 
 
 
