@@ -41,10 +41,15 @@ CSS file:
 - no bitmap pictures
 - added **noopener** and **noreferrer** relations to links to prevent from target="_blank" vulnerability abuse
 
+## Versions
+
+### 0.11
+
+stable release without pagination
+
 ## TODO
 
 - testing background sync
-- pagination with elm
 - lazy loading for very extensive comments
 
 ## Build elm.js howto
