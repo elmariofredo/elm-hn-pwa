@@ -24,7 +24,7 @@ import Json.Decode as JD exposing (Decoder, int, string, list, lazy)
 import Json.Decode.Pipeline exposing (optional, required, decode)
 
 -- list, dict, array
-import List exposing (take, drop, singleton, indexedMap, length, append, head, unzip, partition)
+import List exposing (take, drop, singleton, indexedMap, length, append, head, unzip, partition, (::), filter)
 import Dict exposing (Dict, empty, insert)
 import Array as A
 
@@ -233,12 +233,16 @@ type alias Feed =
         Dict Int (List Item) 
         -- comments are indexed to their parent item
     , ids : WebData (PaginatedList Int)
+        -- pagination of listed items
+    , datacache : Items
+        -- cached items for next and last pages
+        -- useful for pagination
     }
 
 
 initialFeed : Feed
 initialFeed =
-    { data = NotAsked, page = Blank, now = 0, comments = NotAsked, index = empty, ids = NotAsked  }
+    { data = NotAsked, page = Blank, now = 0, comments = NotAsked, index = empty, ids = NotAsked, datacache = NotAsked }
 
 
 
@@ -959,6 +963,7 @@ type Data
     | ChainComments (Time, Int, Items)
     | From (Maybe Page)
     | Go To
+    | PutInCache (WebData Item)
 
 type alias Items =
     WebData (List Item)
@@ -1100,11 +1105,32 @@ getSingleItem id =
             |> Task.perform FetchSingleItem 
 
 
+putItems : RemoteData Http.Error (List Int) -> Cmd Data 
+putItems incache =
+    case incache of
+        Success ids ->
+            let
+                maybeSuccess listWDI =
+                    RD.toMaybe listWDI
+
+                getitem : Int -> Task Never (WebData Item)
+                getitem id =
+                    getTaskWithConfig requestConf (itemurl id) (laz item)
+            in
+                List.map getitem ids
+                    |> List.map (Task.perform PutInCache)
+                    |> Cmd.batch
+
+        _ ->
+            Cmd.none
+
+
 getItems : RemoteData Http.Error (List Int) -> Cmd Data
 getItems ids =
     case ids of
         Success itemIds ->
             let
+                getitem : Int -> Task Never (WebData Item)
                 getitem id =
                     getTaskWithConfig requestConf (itemurl id) (laz item)
             in
@@ -1267,6 +1293,17 @@ update data feed =
                     pagedIds : RemoteData Http.Error (PaginatedList Int) 
                     pagedIds = RD.map (P.fromList maxItemsPerPage) ids
 
+                    nextIds : RemoteData Http.Error (List Int) 
+                    nextIds = RD.map next pagedIds
+                        |> RD.map P.page
+
+                    lastIds : RemoteData Http.Error (List Int) 
+                    lastIds = RD.map last pagedIds
+                        |> RD.map P.page
+
+                    inCache : RemoteData Http.Error (List Int)
+                    inCache = RD.map2 append nextIds lastIds
+
                     -- convert paginated list to normal list
                     listedIds : RemoteData Http.Error (List Int) 
                     listedIds = RD.map P.page pagedIds
@@ -1275,7 +1312,7 @@ update data feed =
                     ----OLD v0.11
                     --( { feed | data = Loading }, getItems ids )
                     ----OLD
-                    ( { feed | data = Loading, ids = pagedIds }, getItems listedIds )
+                    ( { feed | data = Loading, ids = pagedIds }, Cmd.batch [ getItems listedIds, putItems inCache ] )
 
             FetchSingleItem (t, item) ->
                 ( { feed | data = item, now = t }, getKidsOfSeveral item )
@@ -1291,6 +1328,9 @@ update data feed =
 
             From (Just page) ->
                 ( { feed | page = page, comments = NotAsked, index = empty }, getPage page )
+
+            From Nothing ->
+                feed ! [ Cmd.none ]
 
             Go to ->
                 let
@@ -1309,13 +1349,48 @@ update data feed =
                             Last -> 
                                 RD.map last ids 
 
-                    listedIds : RemoteData Http.Error (List Int) 
-                    listedIds = RD.map P.page newPage 
-                in
-                    ( { feed | ids = newPage }, getItems listedIds )
+                    -- revalidate current ids in cache with next ids
+                    inCache : RemoteData Http.Error (List Int) 
+                    inCache = RD.map next ids
+                        |> RD.map P.page
 
-            From Nothing ->
-                feed ! [ Cmd.none ]
+                    fromPage : RemoteData Http.Error (List Int) 
+                    fromPage = RD.map P.page newPage 
+
+                    cacheOrNetwork : Int -> Task Never (WebData Item) 
+                    cacheOrNetwork id =
+                        let
+                            maybeItem : Maybe (List Item)
+                            maybeItem = RD.map (List.filter (\item -> item.id == id)) feed.datacache |> RD.toMaybe
+
+                            fetchItem = getTaskWithConfig requestConf (itemurl id) (laz item)
+                        in
+                            case maybeItem of
+                                Just singleItem ->
+                                    List.map Task.succeed singleItem
+                                        |> head 
+                                        |> Maybe.map (Task.map RD.succeed) 
+                                        |> withDefault fetchItem
+
+                                Nothing ->
+                                    fetchItem
+
+                    getNewItems : RemoteData Http.Error (List Int) -> Cmd Data
+                    getNewItems fromList =
+                        case fromList of
+                            Success ids ->
+                                List.map cacheOrNetwork ids
+                                    |> sequence
+                                    |> enlist
+                            _ ->
+                                Cmd.none
+
+                in
+                    ( { feed | ids = newPage }, Cmd.batch [ getNewItems fromPage, putItems inCache ] )
+
+            PutInCache item ->
+                ( { feed | datacache = RD.map2 (::) item feed.datacache }, Cmd.none )
+
 
 
 {-- ***********************************
